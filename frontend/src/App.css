@@ -1,0 +1,24 @@
+#root {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 0;
+}
+
+.flex {
+  display: flex;
+}
+
+aside {
+  height: calc(100vh - 64px);
+  overflow-y: auto;
+}
+
+main {
+  flex: 1;
+  padding: 20px;
+}
+
+@media (max-width: 640px) {
+  .grid-cols-4 { grid-template-columns: 1fr; }
+  .grid-cols-2 { grid-template-columns: 1fr; }
+}
