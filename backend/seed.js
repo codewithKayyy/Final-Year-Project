@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 const pool = require('./src/config/db');
+=======
+const pool = require('./config/db');
+>>>>>>> 129805f879708b46ec045bc1640945e042508fe0
 
 async function seed() {
     try {
