@@ -5,7 +5,7 @@ const router = express.Router();
 router.use("/staff", require("./staffRoutes"));
 
 // User Authentication and Management API (Placeholder)
-// router.use("/users", require("./userRoutes"));
+router.use("/users", require("./userRoutes"));
 
 // Simulation Configuration and Management API (Placeholder)
 // router.use("/simulations", require("./simulationRoutes"));
