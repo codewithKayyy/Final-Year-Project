@@ -1,0 +1,4 @@
+# attack-executor/scripts/python_email_spoof/requirements.txt
+# No specific external libraries needed for this basic example, but list them here if you add any.
+# For example:
+# requests
