@@ -24,4 +24,14 @@ router.post("/execute", async (req, res, next) => {
     }
 });
 
+// Health check endpoint
+router.get("/health", (req, res) => {
+    res.json({
+        status: "healthy",
+        service: "attack-executor",
+        timestamp: new Date().toISOString(),
+        version: "1.0.0"
+    });
+});
+
 module.exports = router;

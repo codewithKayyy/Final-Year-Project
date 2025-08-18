@@ -1,3 +1,4 @@
+// backend/src/models/User.js
 const db = require("../config/db");
 
 class User {
@@ -5,7 +6,7 @@ class User {
     static async create({ username, email, password_hash, role }) {
         const [result] = await db.execute(
             "INSERT INTO users (username, email, password_hash, role) VALUES (?, ?, ?, ?)",
-            [username, email, password_hash, role || "user"]
+            [username, email, password_hash, role || "admin"] // default to admin to match schema
         );
         return result;
     }
@@ -13,6 +14,12 @@ class User {
     // FIND user by username
     static async findByUsername(username) {
         const [rows] = await db.execute("SELECT * FROM users WHERE username = ?", [username]);
+        return rows[0];
+    }
+
+    // FIND user by email
+    static async findByEmail(email) {
+        const [rows] = await db.execute("SELECT * FROM users WHERE email = ?", [email]);
         return rows[0];
     }
 
@@ -28,15 +35,15 @@ class User {
 
         if (password_hash) {
             query = `
-                UPDATE users 
-                SET username = ?, email = ?, password_hash = ?, role = ?, updated_at = CURRENT_TIMESTAMP 
+                UPDATE users
+                SET username = ?, email = ?, password_hash = ?, role = ?, updated_at = CURRENT_TIMESTAMP
                 WHERE id = ?
             `;
             params = [username, email, password_hash, role, id];
         } else {
             query = `
-                UPDATE users 
-                SET username = ?, email = ?, role = ?, updated_at = CURRENT_TIMESTAMP 
+                UPDATE users
+                SET username = ?, email = ?, role = ?, updated_at = CURRENT_TIMESTAMP
                 WHERE id = ?
             `;
             params = [username, email, role, id];

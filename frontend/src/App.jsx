@@ -1,45 +1,52 @@
-// frontend/src/App.jsx (Updated)
-import React from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import Layout from './components/layout/Layout';
-import ProtectedRoute from './components/common/ProtectedRoute'; // Import ProtectedRoute
+// frontend/src/App.jsx
+import React from "react";
+import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
+import Layout from "./components/layout/Layout";
+import ProtectedRoute from "./components/common/ProtectedRoute";
 
-// Import your page components
-import Dashboard from './pages/Dashboard';
-import StaffManagement from './pages/StaffManagement';
-import SimulationManagement from './pages/SimulationManagement';
+// Import pages
+import Dashboard from "./pages/Dashboard";
+import StaffManagement from "./pages/StaffManagement";
+import CampaignManagement from "./pages/CampaignManagement";
+import SimulationManagement from "./pages/SimulationManagement";
 import SimulationConfig from "./pages/SimulationConfig";
-import AgentManagement from './pages/AgentManagement';
-import AttackLogs from './pages/AttackLogs';
-import Auth from './pages/Auth'; // Import Auth page
+import AgentManagement from "./pages/AgentManagement";
+import AttackLogs from "./pages/AttackLogs";
+import SecurityControls from "./pages/SecurityControls";
+import Settings from "./pages/Settings";
+import Auth from "./pages/Auth";
 
 const App = () => {
     return (
         <Router>
             <Routes>
-                {/* Public route for authentication */}
+                {/* Redirect root to dashboard */}
+                <Route path="/" element={<Navigate to="/dashboard" replace />} />
+
+                {/* Public routes */}
                 <Route path="/login" element={<Auth />} />
 
-                {/* Protected routes - wrapped by ProtectedRoute and Layout */}
-                <Route element={<ProtectedRoute />}> {/* All routes inside this will be protected */}
-                    <Route path="/" element={<Layout />}>
-                        <Route index element={<Dashboard />} /> {/* Default route for / */}
-                        <Route path="dashboard" element={<Dashboard />} />
-                        <Route path="staff" element={<StaffManagement />} />
-                        <Route path="simulations" element={<SimulationManagement />} />
-                        <Route path="/simulation-config" element={<SimulationConfig />} /> {/* Simulation config (create new) */}
-                        <Route path="/simulation-config/:id" element={<SimulationConfig />} /> {/* Simulation config (edit/start existing) */}
-                        <Route path="agents" element={<AgentManagement />} />
-                        <Route path="attack-logs" element={<AttackLogs />} />
-                        <Route path="*" element={<SimulationManagement />} />
-                        {/* Add more routes as you create pages */}
+                {/* Protected routes wrapped in Layout */}
+                <Route element={<ProtectedRoute />}>
+                    <Route element={<Layout />}>
+                        <Route path="/dashboard" element={<Dashboard />} />
+                        <Route path="/staff" element={<StaffManagement />} />
+                        <Route path="/agents" element={<AgentManagement />} />
+                        <Route path="/campaigns" element={<CampaignManagement />} />
+                        <Route path="/simulations" element={<SimulationManagement />} />
+                        <Route path="/simulation-config" element={<SimulationConfig />} />
+                        <Route path="/simulation-config/:id" element={<SimulationConfig />} />
+                        <Route path="/attack-logs" element={<AttackLogs />} />
+                        <Route path="/security-controls" element={<SecurityControls />} />
+                        <Route path="/settings" element={<Settings />} />
                     </Route>
                 </Route>
 
-                {/* Catch-all for 404 - optional */}
-                {/* <Route path="*" element={<NotFoundPage />} /> */}
+                {/* Catch all route for 404 */}
+                <Route path="*" element={<Navigate to="/login" replace />} />
             </Routes>
         </Router>
+
     );
 };
 

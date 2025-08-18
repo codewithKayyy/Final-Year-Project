@@ -1,3 +1,4 @@
+// backend/src/routes/index.js
 const express = require("express");
 const router = express.Router();
 
@@ -6,6 +7,9 @@ router.use("/staff", require("./staffRoutes"));
 
 // User Authentication and Management API (Placeholder)
 router.use("/users", require("./userRoutes"));
+
+// Campaign Management API
+router.use("/campaigns", require("./campaignRoutes"));
 
 // Simulation Configuration and Management API (Placeholder)
 router.use("/simulations", require("./simulationRoutes")); // CRUD endpoints (list, get, update, delete)
@@ -19,5 +23,11 @@ router.use("/agents", require("./agentRoutes"));
 // router.use("/reports", require("./reportRoutes"));
 
 router.use("/attack-logs", require("./attackLogRoutes"));
+
+// Phishing Email Templates API
+router.use("/phishing-emails", require("./phishingEmailRoutes"));
+
+// System Health and Metrics API
+router.use("/system", require("./systemRoutes"));
 
 module.exports = router;

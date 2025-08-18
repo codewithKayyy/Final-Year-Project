@@ -45,10 +45,47 @@ const validateStaffInput = (data, isEdit = false) => {
 };
 
 // -----------------------------
-// Validate Simulation CRUD Data
+// Validate Campaign Data
+// -----------------------------
+const validateCampaignData = (data, isEdit = false) => {
+    const { name, type, status } = data;
+
+    if (!isEdit && !name) {
+        throw new ValidationError("Campaign name is required.");
+    }
+    if (!isEdit && !type) {
+        throw new ValidationError("Campaign type is required.");
+    }
+
+    const validTypes = ["Phishing", "USB", "Social Engineering", "Physical", "Other"];
+    if (type && !validTypes.includes(type)) {
+        throw new ValidationError(`Invalid campaign type. Must be one of: ${validTypes.join(", ")}`);
+    }
+
+    const validStatuses = ["DRAFT", "SCHEDULED", "RUNNING", "COMPLETED", "CANCELLED"];
+    if (status && !validStatuses.includes(status)) {
+        throw new ValidationError(`Invalid campaign status. Must be one of: ${validStatuses.join(", ")}`);
+    }
+
+    // Validate numeric fields
+    if (data.participant_count !== undefined && (isNaN(data.participant_count) || data.participant_count < 0)) {
+        throw new ValidationError("Participant count must be a non-negative number.");
+    }
+
+    if (data.click_rate !== undefined && (isNaN(data.click_rate) || data.click_rate < 0 || data.click_rate > 100)) {
+        throw new ValidationError("Click rate must be a percentage between 0 and 100.");
+    }
+
+    if (data.report_rate !== undefined && (isNaN(data.report_rate) || data.report_rate < 0 || data.report_rate > 100)) {
+        throw new ValidationError("Report rate must be a percentage between 0 and 100.");
+    }
+};
+
+// -----------------------------
+// Validate Simulation CRUD Data (UPDATED WITH CAMPAIGN SUPPORT)
 // -----------------------------
 const validateSimulationData = (data, isEdit = false) => {
-    const { name, targetStaffId, status } = data;
+    const { name, targetStaffId, status, campaign_id } = data;
 
     if (!isEdit && !name) {
         throw new ValidationError("Simulation name is required.");
@@ -61,13 +98,20 @@ const validateSimulationData = (data, isEdit = false) => {
     if (status && !validStatuses.includes(status)) {
         throw new ValidationError(`Invalid simulation status. Must be one of: ${validStatuses.join(", ")}`);
     }
+
+    // campaign_id is optional but if provided, should be a positive integer
+    if (campaign_id !== undefined && campaign_id !== null) {
+        if (isNaN(campaign_id) || campaign_id <= 0 || !Number.isInteger(Number(campaign_id))) {
+            throw new ValidationError("Campaign ID must be a positive integer.");
+        }
+    }
 };
 
 // -----------------------------
-// Validate Start Simulation Request
+// Validate Start Simulation Request (UPDATED WITH CAMPAIGN SUPPORT)
 // -----------------------------
 const validateSimulationStartData = (data) => {
-    const { name, targetStaffId, attackScriptId } = data;
+    const { name, targetStaffId, attackScriptId, campaign_id } = data;
 
     if (!name) {
         throw new ValidationError("Simulation name is required to start.");
@@ -77,6 +121,13 @@ const validateSimulationStartData = (data) => {
     }
     if (!attackScriptId) {
         throw new ValidationError("Attack script ID is required.");
+    }
+
+    // campaign_id is optional but if provided, should be a positive integer
+    if (campaign_id !== undefined && campaign_id !== null) {
+        if (isNaN(campaign_id) || campaign_id <= 0 || !Number.isInteger(Number(campaign_id))) {
+            throw new ValidationError("Campaign ID must be a positive integer.");
+        }
     }
 };
 
@@ -105,10 +156,57 @@ const validateAttackLogData = (data) => {
     }
 };
 
+// -----------------------------
+// Validate Phishing Email Data
+// -----------------------------
+const validatePhishingEmailData = (data, isEdit = false) => {
+    const { campaign_id, subject, html_content, from_name, from_email, target_url } = data;
+
+    if (!isEdit && !campaign_id) {
+        throw new ValidationError("Campaign ID is required.");
+    }
+    if (!subject) {
+        throw new ValidationError("Email subject is required.");
+    }
+    if (!html_content) {
+        throw new ValidationError("HTML content is required.");
+    }
+    if (!from_name) {
+        throw new ValidationError("From name is required.");
+    }
+    if (!from_email) {
+        throw new ValidationError("From email is required.");
+    }
+    if (!target_url) {
+        throw new ValidationError("Target URL is required.");
+    }
+
+    // Validate email format
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(from_email)) {
+        throw new ValidationError("Invalid from email format.");
+    }
+
+    // Validate URL format
+    const urlRegex = /^(https?|ftp):\/\/[^\s/$.?#].[^\s]*$/;
+    if (!urlRegex.test(target_url)) {
+        throw new ValidationError("Invalid target URL format.");
+    }
+
+    // campaign_id should be a positive integer
+    if (campaign_id !== undefined && campaign_id !== null) {
+        if (isNaN(campaign_id) || campaign_id <= 0 || !Number.isInteger(Number(campaign_id))) {
+            throw new ValidationError("Campaign ID must be a positive integer.");
+        }
+    }
+};
+
 module.exports = {
     ValidationError,
     validateStaffInput,
+    validateCampaignData,
     validateSimulationData,
     validateSimulationStartData,
-    validateAttackLogData
+    validateAttackLogData,
+    validatePhishingEmailData
 };

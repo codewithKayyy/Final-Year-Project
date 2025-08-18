@@ -6,9 +6,9 @@ const AttackLog = require("../models/AttackLog");
 const { validateSimulationData, validateAttackLogData } = require("../utils/validators");
 const { notifySimulationUpdate } = require("../services/simulationService");
 
-// ----------------- CRUD ROUTES -----------------
+// ----------------- CRUD ROUTES (ENHANCED WITH CAMPAIGN SUPPORT) -----------------
 
-// GET all simulations
+// GET all simulations (with campaign info)
 router.get("/", async (req, res, next) => {
     try {
         const simulations = await Simulation.getAll();
@@ -18,7 +18,7 @@ router.get("/", async (req, res, next) => {
     }
 });
 
-// GET single simulation by ID
+// GET single simulation by ID (with campaign info)
 router.get("/:id", async (req, res, next) => {
     try {
         const simulation = await Simulation.getById(req.params.id);
@@ -31,7 +31,17 @@ router.get("/:id", async (req, res, next) => {
     }
 });
 
-// POST new simulation
+// GET simulations by campaign ID (NEW)
+router.get("/campaign/:campaignId", async (req, res, next) => {
+    try {
+        const simulations = await Simulation.getByCampaignId(req.params.campaignId);
+        res.json(simulations);
+    } catch (error) {
+        next(error);
+    }
+});
+
+// POST new simulation (with campaign_id support)
 router.post("/", async (req, res, next) => {
     try {
         validateSimulationData(req.body);
@@ -46,7 +56,7 @@ router.post("/", async (req, res, next) => {
     }
 });
 
-// PUT update simulation
+// PUT update simulation (with campaign_id support)
 router.put("/:id", async (req, res, next) => {
     try {
         validateSimulationData(req.body, true);
@@ -73,41 +83,29 @@ router.delete("/:id", async (req, res, next) => {
     }
 });
 
-// ----------------- WEBHOOK ROUTE -----------------
+// GET campaign statistics (NEW)
+router.get("/:campaignId/stats", async (req, res, next) => {
+    try {
+        const stats = await Simulation.getCampaignStats(req.params.campaignId);
+        res.json(stats);
+    } catch (error) {
+        next(error);
+    }
+});
+
+// ----------------- WEBHOOK ROUTE (KEEP EXISTING) -----------------
 router.post("/update-attack-log", async (req, res, next) => {
     try {
-        // 1. Validate incoming payload
         validateAttackLogData(req.body);
-
         const { simulationId, agentId, scriptId, status, stdout, stderr, error } = req.body;
 
-        // 2. Save or update attack log
-        await AttackLog.updateLog({
-            simulationId,
-            agentId,
-            scriptId,
-            status,
-            stdout,
-            stderr,
-            error
-        });
+        await AttackLog.updateLog({ simulationId, agentId, scriptId, status, stdout, stderr, error });
 
-        // 3. Update simulation status if finished
         if (status === "completed" || status === "failed") {
             await Simulation.update(simulationId, { status });
         }
 
-        // 4. Notify dashboards in real-time
-        notifySimulationUpdate(simulationId, {
-            status,
-            agentId,
-            scriptId,
-            stdout,
-            stderr,
-            error
-        });
-
-        // 5. Respond to executor
+        notifySimulationUpdate(simulationId, { status, agentId, scriptId, stdout, stderr, error });
         res.status(200).json({ message: "Attack log updated successfully" });
     } catch (err) {
         next(err);

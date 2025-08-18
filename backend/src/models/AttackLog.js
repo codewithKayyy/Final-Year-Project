@@ -5,7 +5,7 @@ class AttackLog {
     // ========== CRUD METHODS ==========
     static async getAll() {
         const [rows] = await db.query(
-            "SELECT * FROM attack_logs ORDER BY timestamp DESC"
+            "SELECT * FROM attack_logs ORDER BY `timestamp` DESC"
         );
         return rows;
     }
@@ -68,7 +68,7 @@ class AttackLog {
 
     static async getLogsBySimulationId(simulationId) {
         const [rows] = await db.query(
-            "SELECT * FROM attack_logs WHERE simulation_id = ? ORDER BY timestamp ASC",
+            "SELECT * FROM attack_logs WHERE simulation_id = ? ORDER BY `timestamp` ASC",
             [simulationId]
         );
         return rows;
@@ -76,7 +76,7 @@ class AttackLog {
 
     static async getLogsByAgentId(agentId) {
         const [rows] = await db.query(
-            "SELECT * FROM attack_logs WHERE agent_id = ? ORDER BY timestamp ASC",
+            "SELECT * FROM attack_logs WHERE agent_id = ? ORDER BY `timestamp` ASC", // Changed here
             [agentId]
         );
         return rows;

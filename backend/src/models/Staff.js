@@ -76,6 +76,36 @@ class Staff {
         const [rows] = await db.execute(query);
         return rows[0];
     }
+
+    // Get staff with their assigned agents
+    static async getWithAgents() {
+        const query = `
+        SELECT s.id, s.name, s.email, s.college, s.role, s.risk,
+               a.id as agent_id, a.status as agent_status, a.last_seen
+        FROM staff s
+        LEFT JOIN agents a ON a.staff_id = s.id
+        ORDER BY s.id ASC
+    `;
+        const [rows] = await db.execute(query);
+        return rows;
+    }
+
+// Get simulation history for a staff member
+    static async getSimulationHistory(staffId) {
+        const query = `
+        SELECT sim.id as simulation_id, sim.type, sim.status, sim.created_at,
+               al.status as outcome, al.details
+        FROM simulations sim
+        JOIN attack_logs al ON al.simulationId = sim.id
+        WHERE al.agentId IN (
+            SELECT id FROM agents WHERE staff_id = ?
+        )
+        ORDER BY sim.created_at DESC
+    `;
+        const [rows] = await db.execute(query, [staffId]);
+        return rows;
+    }
+
 }
 
 module.exports = Staff;
