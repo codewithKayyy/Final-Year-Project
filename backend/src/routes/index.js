@@ -8,7 +8,9 @@ router.use("/staff", require("./staffRoutes"));
 router.use("/users", require("./userRoutes"));
 
 // Simulation Configuration and Management API (Placeholder)
-router.use("/simulations", require("./simulationRoutes"));
+router.use("/simulations", require("./simulationRoutes")); // CRUD endpoints (list, get, update, delete)
+
+router.use("/simulations", require("./simulationControlRoutes")); //Start/stop simulation commands
 
 // Agent Management and Communication API (Placeholder - for main backend's role)
 router.use("/agents", require("./agentRoutes"));

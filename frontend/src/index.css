@@ -1,3 +1,9 @@
+/* frontend/src/index.css or assets/styles/index.css */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* You can add any custom global styles here */
+body {
+    font-family: 'Inter', sans-serif; /* Example font */
+}

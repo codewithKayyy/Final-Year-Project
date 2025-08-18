@@ -1,98 +1,104 @@
-const { Server } = require("socket.io");
+// backend/src/services/agentService.js
+const { getIo } = require("./socketService");
+const Telemetry = require("../models/Telemetry");
+const AttackLog = require("../models/AttackLog");
 
-let io;
-const connectedAgents = new Map(); // Map to store agentId -> socketId
-const socketToAgentMap = new Map(); // Map to store socketId -> agentId
+const connectedAgents = new Map();   // agentId -> { socketId, telemetry }
+const socketToAgentMap = new Map();  // socketId -> agentId
 
-const initializeSocketIO = (httpServer) => {
-    io = new Server(httpServer, {
-        cors: {
-            origin: "*", // Adjust for production: your frontend domain, or specific agent origins
-            methods: ["GET", "POST"]
-        }
-    });
+function registerAgent(socket, agentId) {
+    const io = getIo();
 
-    io.on("connection", (socket) => {
-        console.log(`Agent connected: ${socket.id}`);
-
-        // Agent registration (e.g., agent sends its unique ID)
-        socket.on("registerAgent", (agentId) => {
-            if (connectedAgents.has(agentId)) {
-                console.warn(`Agent ${agentId} already connected. Disconnecting old socket.`);
-                // Optionally disconnect old socket if a new one connects with same ID
-                const oldSocketId = connectedAgents.get(agentId);
-                io.sockets.sockets.get(oldSocketId)?.disconnect();
-            }
-            connectedAgents.set(agentId, socket.id);
-            socketToAgentMap.set(socket.id, agentId);
-            console.log(`Agent ${agentId} registered with socket ID ${socket.id}`);
-            // Emit status update to dashboard or log
-            io.emit("agentStatusUpdate", { agentId, status: "online" });
-        });
-
-        // Handle telemetry data from agents
-        socket.on("telemetry", (data) => {
-            const agentId = socketToAgentMap.get(socket.id);
-            console.log(`Telemetry from ${agentId || socket.id}:`, data);
-            // TODO: Process and store telemetry data in database
-            // Example: Save to a 'telemetry_logs' table
-            // TelemetryModel.save(agentId, data);
-        });
-
-        // Handle agent reporting attack outcomes
-        socket.on("attackOutcome", (data) => {
-            const agentId = socketToAgentMap.get(socket.id);
-            console.log(`Attack outcome from ${agentId || socket.id}:`, data);
-            // TODO: Update simulation/attack_logs in database
-            // AttackLogModel.updateOutcome(data.simulationId, agentId, data.outcome);
-        });
-
-        socket.on("disconnect", () => {
-            const agentId = socketToAgentMap.get(socket.id);
-            if (agentId) {
-                connectedAgents.delete(agentId);
-                socketToAgentMap.delete(socket.id);
-                console.log(`Agent ${agentId} disconnected (socket ID: ${socket.id})`);
-                io.emit("agentStatusUpdate", { agentId, status: "offline" });
-            } else {
-                console.log(`Agent disconnected (socket ID: ${socket.id})`);
-            }
-        });
-
-        socket.on("error", (err) => {
-            console.error(`Socket error for ${socket.id}:`, err);
-        });
-    });
-
-    console.log("Socket.IO server initialized.");
-};
-
-const getIo = () => {
-    if (!io) {
-        throw new Error("Socket.IO not initialized!");
+    // Handle duplicate connections
+    if (connectedAgents.has(agentId)) {
+        console.warn(`⚠️ Agent ${agentId} already connected. Disconnecting old socket.`);
+        const oldSocketId = connectedAgents.get(agentId).socketId;
+        io.sockets.sockets.get(oldSocketId)?.disconnect();
     }
-    return io;
-};
 
-const sendCommandToAgent = (agentId, commandType, payload) => {
-    const socketId = connectedAgents.get(agentId);
-    if (socketId) {
-        io.to(socketId).emit("command", { type: commandType, payload });
-        console.log(`Command '${commandType}' sent to agent ${agentId}`);
-        return true;
+    connectedAgents.set(agentId, { socketId: socket.id, telemetry: {} });
+    socketToAgentMap.set(socket.id, agentId);
+
+    console.log(`✅ Agent ${agentId} registered with socket ${socket.id}`);
+    io.emit("agentStatusUpdate", { agentId, status: "online" });
+}
+
+function unregisterAgent(socketId) {
+    const io = getIo();
+    const agentId = socketToAgentMap.get(socketId);
+
+    if (agentId) {
+        connectedAgents.delete(agentId);
+        socketToAgentMap.delete(socketId);
+
+        console.log(`❌ Agent ${agentId} disconnected (socket ID: ${socketId})`);
+        io.emit("agentStatusUpdate", { agentId, status: "offline" });
     } else {
-        console.warn(`Agent ${agentId} not connected. Command '${commandType}' not sent.`);
+        console.log(`❌ Unknown socket ${socketId} disconnected`);
+    }
+}
+
+function sendCommandToAgent(agentId, commandType, payload) {
+    const io = getIo();
+    const agentInfo = connectedAgents.get(agentId);
+
+    if (!agentInfo) {
+        console.warn(`⚠️ Agent ${agentId} not connected. Command '${commandType}' not sent.`);
         return false;
     }
-};
 
-const getConnectedAgents = () => {
-    return Array.from(connectedAgents.keys());
-};
+    io.to(agentInfo.socketId).emit("command", { type: commandType, payload });
+    console.log(`📢 Command '${commandType}' sent to agent ${agentId}`);
+    return true;
+}
+
+async function handleTelemetry(socket, data) {
+    const agentId = socketToAgentMap.get(socket.id);
+    console.log(`📡 Telemetry from ${agentId || socket.id}:`, data);
+
+    if (agentId) {
+        try {
+            connectedAgents.get(agentId).telemetry = data; // store in memory
+            await Telemetry.save(agentId, data); // persist to DB
+        } catch (err) {
+            console.error("❌ Failed to save telemetry:", err.message);
+        }
+    }
+}
+
+async function handleAttackOutcome(socket, data) {
+    const agentId = socketToAgentMap.get(socket.id);
+    console.log(`🎯 Attack outcome from ${agentId || socket.id}:`, data);
+
+    if (agentId) {
+        try {
+            await AttackLog.updateLog({
+                simulationId: data.simulationId,
+                agentId,
+                scriptId: data.scriptId,
+                status: data.outcome,
+                stdout: data.details,
+                stderr: null,
+                error: data.error || null
+            });
+        } catch (err) {
+            console.error("❌ Failed to update attack log:", err.message);
+        }
+    }
+}
+
+function getConnectedAgents() {
+    return Array.from(connectedAgents.entries()).map(([agentId, info]) => ({
+        agentId,
+        telemetry: info.telemetry
+    }));
+}
 
 module.exports = {
-    initializeSocketIO,
-    getIo,
+    registerAgent,
+    unregisterAgent,
     sendCommandToAgent,
+    handleTelemetry,
+    handleAttackOutcome,
     getConnectedAgents
 };

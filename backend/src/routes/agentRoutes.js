@@ -1,9 +1,14 @@
+// backend/src/routes/agentRoutes.js
 const express = require("express");
 const router = express.Router();
-const Agent = require("../models/Agent");
+const Agent = require("../models/Agent"); // persistent DB model
 const { sendCommandToAgent, getConnectedAgents } = require("../services/agentService");
 
-// GET all agents
+//
+// ─── CRUD Endpoints (Database agents) ─────────────────────────────────────────
+//
+
+// GET all agents (DB)
 router.get("/", async (req, res, next) => {
     try {
         const agents = await Agent.getAll();
@@ -13,11 +18,10 @@ router.get("/", async (req, res, next) => {
     }
 });
 
-// GET single agent by ID
+// GET single agent by ID (DB)
 router.get("/:id", async (req, res, next) => {
     try {
-        const { id } = req.params;
-        const agent = await Agent.getById(id);
+        const agent = await Agent.getById(req.params.id);
         if (!agent) {
             return res.status(404).json({ message: "Agent not found" });
         }
@@ -27,7 +31,7 @@ router.get("/:id", async (req, res, next) => {
     }
 });
 
-// POST new agent
+// POST new agent (DB)
 router.post("/", async (req, res, next) => {
     try {
         const newAgent = await Agent.create(req.body);
@@ -37,11 +41,10 @@ router.post("/", async (req, res, next) => {
     }
 });
 
-// PUT update agent
+// PUT update agent (DB)
 router.put("/:id", async (req, res, next) => {
     try {
-        const { id } = req.params;
-        const result = await Agent.update(id, req.body);
+        const result = await Agent.update(req.params.id, req.body);
         if (result.affectedRows === 0) {
             return res.status(404).json({ message: "Agent not found" });
         }
@@ -51,11 +54,10 @@ router.put("/:id", async (req, res, next) => {
     }
 });
 
-// DELETE agent
+// DELETE agent (DB)
 router.delete("/:id", async (req, res, next) => {
     try {
-        const { id } = req.params;
-        const result = await Agent.delete(id);
+        const result = await Agent.delete(req.params.id);
         if (result.affectedRows === 0) {
             return res.status(404).json({ message: "Agent not found" });
         }
@@ -65,14 +67,18 @@ router.delete("/:id", async (req, res, next) => {
     }
 });
 
-// Endpoint for attack execution service to send commands to agents
+//
+// ─── Real-time Agent Endpoints (WebSockets) ──────────────────────────────────
+//
+
+// POST /api/agents/command → send command to a connected agent
 router.post("/command", (req, res) => {
     const { agentId, commandType, payload } = req.body;
     if (!agentId || !commandType) {
         return res.status(400).json({ message: "agentId and commandType are required." });
     }
 
-    const sent = sendCommandToAgent(agentId, commandType, payload);
+    const sent = sendCommandToAgent(agentId, commandType, payload || {});
     if (sent) {
         res.json({ success: true, message: `Command '${commandType}' sent to agent ${agentId}` });
     } else {
@@ -80,8 +86,8 @@ router.post("/command", (req, res) => {
     }
 });
 
-// Endpoint to get list of currently connected agents (for dashboard or internal use)
-router.get("/connected", (req, res) => {
+// GET /api/agents/connected → list connected agents with telemetry
+router.get("/connected/list", (req, res) => {
     const agents = getConnectedAgents();
     res.json({ connectedAgents: agents });
 });

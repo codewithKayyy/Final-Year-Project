@@ -1,16 +1,25 @@
-<<<<<<< HEAD
+// Adjust the path depending on where your db.js lives
 const pool = require('./src/config/db');
-=======
-const pool = require('./config/db');
->>>>>>> 129805f879708b46ec045bc1640945e042508fe0
 
 async function seed() {
     try {
-        await pool.query('INSERT INTO campaigns (name, status, type, progress, click_rate, report_rate) VALUES (?, ?, ?, ?, ?, ?)',
-            ['Q4 Finance Department Training', 'ACTIVE', 'Email Phishing', 10/101, 22.8, 14.9]);
-        console.log('Data seeded');
+        const campaigns = [
+            ["Q4 Finance Training", "ACTIVE", "Email Phishing", 10, 22.8, 14.9],
+            ["Q1 HR Awareness", "COMPLETED", "Spear Phishing", 100, 30.2, 12.5],
+            ["Q2 IT Security", "ACTIVE", "Malware Simulation", 45, 18.9, 9.4],
+            ["Q3 Staff Refresher", "ACTIVE", "Social Engineering", 0, 0.0, 0.0] // ✅ changed PENDING → ACTIVE
+        ];
+
+        await pool.query(
+            `INSERT INTO campaigns 
+                (name, status, type, progress, click_rate, report_rate) 
+             VALUES ?`,
+            [campaigns]
+        );
+
+        console.log('✅ Multiple campaigns seeded successfully');
     } catch (err) {
-        console.log(err);
+        console.error('❌ Error seeding data:', err);
     } finally {
         await pool.end();
     }

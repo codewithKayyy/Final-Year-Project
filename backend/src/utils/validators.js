@@ -6,6 +6,9 @@ class ValidationError extends Error {
     }
 }
 
+// -----------------------------
+// Validate Staff Data
+// -----------------------------
 const validateStaffInput = (data, isEdit = false) => {
     const { id, name, email, college, role, risk } = data;
 
@@ -41,4 +44,71 @@ const validateStaffInput = (data, isEdit = false) => {
     }
 };
 
-module.exports = { ValidationError, validateStaffInput };
+// -----------------------------
+// Validate Simulation CRUD Data
+// -----------------------------
+const validateSimulationData = (data, isEdit = false) => {
+    const { name, targetStaffId, status } = data;
+
+    if (!isEdit && !name) {
+        throw new ValidationError("Simulation name is required.");
+    }
+    if (!isEdit && !targetStaffId) {
+        throw new ValidationError("Target staff ID is required.");
+    }
+
+    const validStatuses = ["pending", "running", "completed", "failed"];
+    if (status && !validStatuses.includes(status)) {
+        throw new ValidationError(`Invalid simulation status. Must be one of: ${validStatuses.join(", ")}`);
+    }
+};
+
+// -----------------------------
+// Validate Start Simulation Request
+// -----------------------------
+const validateSimulationStartData = (data) => {
+    const { name, targetStaffId, attackScriptId } = data;
+
+    if (!name) {
+        throw new ValidationError("Simulation name is required to start.");
+    }
+    if (!targetStaffId) {
+        throw new ValidationError("Target staff ID is required.");
+    }
+    if (!attackScriptId) {
+        throw new ValidationError("Attack script ID is required.");
+    }
+};
+
+// -----------------------------
+// Validate Attack Log Data (Webhook)
+// -----------------------------
+const validateAttackLogData = (data) => {
+    const { simulationId, agentId, scriptId, status } = data;
+
+    if (!simulationId) {
+        throw new ValidationError("simulationId is required in attack log.");
+    }
+    if (!agentId) {
+        throw new ValidationError("agentId is required in attack log.");
+    }
+    if (!scriptId) {
+        throw new ValidationError("scriptId is required in attack log.");
+    }
+    if (!status) {
+        throw new ValidationError("status is required in attack log.");
+    }
+
+    const validStatuses = ["pending", "running", "completed", "failed"];
+    if (!validStatuses.includes(status)) {
+        throw new ValidationError(`Invalid status. Must be one of: ${validStatuses.join(", ")}`);
+    }
+};
+
+module.exports = {
+    ValidationError,
+    validateStaffInput,
+    validateSimulationData,
+    validateSimulationStartData,
+    validateAttackLogData
+};
