@@ -1,10 +1,8 @@
-<<<<<<< HEAD
 #!/usr/bin/env node
 // agent-app/index.js
 require("dotenv").config();
 const io = require("socket.io-client");
 const os = require("os");
-const { v4: uuidv4 } = require("uuid");
 const fs = require("fs");
 const path = require("path");
 
@@ -23,21 +21,22 @@ let heartbeatInterval;
 function generateAgentId() {
     const hostname = os.hostname();
     const platform = os.platform();
-    const arch = os.arch();
     const networkInterfaces = os.networkInterfaces();
 
     // Get primary MAC address
-    let macAddress = 'unknown';
+    let macAddress = "unknown";
     for (const interfaceName in networkInterfaces) {
         const iface = networkInterfaces[interfaceName];
-        const nonInternal = iface.find(alias => !alias.internal && alias.mac !== '00:00:00:00:00:00');
+        const nonInternal = iface.find(
+            alias => !alias.internal && alias.mac !== "00:00:00:00:00:00"
+        );
         if (nonInternal) {
             macAddress = nonInternal.mac;
             break;
         }
     }
 
-    return `agent_${hostname}_${platform}_${macAddress.replace(/:/g, '')}`;
+    return `agent_${hostname}_${platform}_${macAddress.replace(/:/g, "")}`;
 }
 
 // Get system telemetry
@@ -58,13 +57,15 @@ function getSystemTelemetry() {
 
         // System metrics
         cpuCount: cpus.length,
-        cpuModel: cpus[0]?.model || 'unknown',
+        cpuModel: cpus[0]?.model || "unknown",
         loadAverage: loadAverage[0], // 1-minute load average
         totalMemoryMB: Math.round(totalMemory / 1024 / 1024),
         freeMemoryMB: Math.round(freeMemory / 1024 / 1024),
-        memoryUsagePercent: Math.round(((totalMemory - freeMemory) / totalMemory) * 100),
+        memoryUsagePercent: Math.round(
+            ((totalMemory - freeMemory) / totalMemory) * 100
+        ),
 
-        status: "active"
+        status: "active",
     };
 }
 
@@ -74,7 +75,7 @@ function initializeConnection() {
 
     socket = io(BACKEND_WS_URL, {
         timeout: 10000,
-        reconnection: false // We'll handle reconnection manually
+        reconnection: false, // We'll handle reconnection manually
     });
 
     // Connection successful
@@ -91,7 +92,7 @@ function initializeConnection() {
             ipAddress: getLocalIPAddress(),
             macAddress: getPrimaryMacAddress(),
             osVersion: os.release(),
-            nodeVersion: process.version
+            nodeVersion: process.version,
         };
 
         socket.emit("registerAgent", registrationData);
@@ -111,13 +112,11 @@ function initializeConnection() {
         console.log(`❌ Agent ${AGENT_ID} disconnected: ${reason}`);
         stopHeartbeat();
 
-        // Attempt to reconnect unless it was intentional
         if (reason !== "io client disconnect") {
             scheduleReconnect();
         }
     });
 
-    // Connection errors
     socket.on("connect_error", (error) => {
         console.error(`⚠️ Connection error:`, error.message);
         scheduleReconnect();
@@ -133,12 +132,14 @@ function getLocalIPAddress() {
     const networkInterfaces = os.networkInterfaces();
     for (const interfaceName in networkInterfaces) {
         const iface = networkInterfaces[interfaceName];
-        const nonInternal = iface.find(alias => !alias.internal && alias.family === 'IPv4');
+        const nonInternal = iface.find(
+            alias => !alias.internal && alias.family === "IPv4"
+        );
         if (nonInternal) {
             return nonInternal.address;
         }
     }
-    return 'unknown';
+    return "unknown";
 }
 
 // Get primary MAC address
@@ -146,35 +147,40 @@ function getPrimaryMacAddress() {
     const networkInterfaces = os.networkInterfaces();
     for (const interfaceName in networkInterfaces) {
         const iface = networkInterfaces[interfaceName];
-        const nonInternal = iface.find(alias => !alias.internal && alias.mac !== '00:00:00:00:00:00');
+        const nonInternal = iface.find(
+            alias => !alias.internal && alias.mac !== "00:00:00:00:00:00"
+        );
         if (nonInternal) {
             return nonInternal.mac;
         }
     }
-    return 'unknown';
+    return "unknown";
 }
 
 // Handle commands from backend
 function handleCommand(data) {
-    console.log(`📥 Received command: ${data.type}`, data.payload || '');
+    console.log(`📥 Received command: ${data.type}`, data.payload || "");
 
     switch (data.type) {
-        case 'ping':
-            socket.emit('pong', { agentId: AGENT_ID, timestamp: new Date().toISOString() });
+        case "ping":
+            socket.emit("pong", {
+                agentId: AGENT_ID,
+                timestamp: new Date().toISOString(),
+            });
             break;
 
-        case 'shutdown':
-            console.log('🛑 Shutdown command received');
+        case "shutdown":
+            console.log("🛑 Shutdown command received");
             gracefulShutdown();
             break;
 
-        case 'restart':
-            console.log('🔄 Restart command received');
-            process.exit(0); // Let process manager restart
+        case "restart":
+            console.log("🔄 Restart command received");
+            process.exit(0);
             break;
 
-        case 'updateTelemetry':
-            socket.emit('telemetry', getSystemTelemetry());
+        case "updateTelemetry":
+            socket.emit("telemetry", getSystemTelemetry());
             break;
 
         default:
@@ -184,28 +190,27 @@ function handleCommand(data) {
 
 // Handle simulation execution commands
 function handleSimulationExecution(data) {
-    const { simulationId, agentId, scriptId, params } = data;
+    const { simulationId, scriptId, params } = data;
     console.log(`🎯 Executing simulation ${simulationId} with script ${scriptId}`);
 
-    // Simulate attack execution (in real implementation, this would execute actual scripts)
     setTimeout(() => {
         const result = {
             simulationId,
             agentId: AGENT_ID,
             scriptId,
-            status: 'completed',
+            status: "completed",
             timestamp: new Date().toISOString(),
-            outcome: 'success',
+            outcome: "success",
             details: {
-                message: 'Simulation executed successfully',
-                executionTime: Math.floor(Math.random() * 5000) + 1000, // 1-6 seconds
-                params: params
-            }
+                message: "Simulation executed successfully",
+                executionTime: Math.floor(Math.random() * 5000) + 1000,
+                params: params,
+            },
         };
 
-        socket.emit('simulationResult', result);
+        socket.emit("simulationResult", result);
         console.log(`✅ Simulation ${simulationId} completed`);
-    }, Math.floor(Math.random() * 3000) + 500); // Random delay 0.5-3.5 seconds
+    }, Math.floor(Math.random() * 3000) + 500);
 }
 
 // Start heartbeat telemetry
@@ -230,14 +235,21 @@ function stopHeartbeat() {
 // Schedule reconnection attempt
 function scheduleReconnect() {
     if (reconnectAttempts >= MAX_RECONNECT_ATTEMPTS) {
-        console.error(`❌ Max reconnection attempts (${MAX_RECONNECT_ATTEMPTS}) reached. Exiting.`);
+        console.error(
+            `❌ Max reconnection attempts (${MAX_RECONNECT_ATTEMPTS}) reached. Exiting.`
+        );
         process.exit(1);
     }
 
     reconnectAttempts++;
-    const delay = Math.min(RECONNECT_INTERVAL * Math.pow(2, reconnectAttempts - 1), 60000); // Exponential backoff, max 1 minute
+    const delay = Math.min(
+        RECONNECT_INTERVAL * Math.pow(2, reconnectAttempts - 1),
+        60000
+    );
 
-    console.log(`🔄 Reconnection attempt ${reconnectAttempts}/${MAX_RECONNECT_ATTEMPTS} in ${delay}ms`);
+    console.log(
+        `🔄 Reconnection attempt ${reconnectAttempts}/${MAX_RECONNECT_ATTEMPTS} in ${delay}ms`
+    );
 
     setTimeout(() => {
         if (socket) {
@@ -250,12 +262,15 @@ function scheduleReconnect() {
 
 // Graceful shutdown
 function gracefulShutdown() {
-    console.log('🛑 Shutting down agent...');
+    console.log("🛑 Shutting down agent...");
 
     stopHeartbeat();
 
     if (socket) {
-        socket.emit('agentShutdown', { agentId: AGENT_ID, timestamp: new Date().toISOString() });
+        socket.emit("agentShutdown", {
+            agentId: AGENT_ID,
+            timestamp: new Date().toISOString(),
+        });
         socket.close();
     }
 
@@ -263,14 +278,14 @@ function gracefulShutdown() {
 }
 
 // Handle process signals
-process.on('SIGINT', gracefulShutdown);
-process.on('SIGTERM', gracefulShutdown);
-process.on('uncaughtException', (error) => {
-    console.error('Uncaught Exception:', error);
+process.on("SIGINT", gracefulShutdown);
+process.on("SIGTERM", gracefulShutdown);
+process.on("uncaughtException", (error) => {
+    console.error("Uncaught Exception:", error);
     gracefulShutdown();
 });
-process.on('unhandledRejection', (reason, promise) => {
-    console.error('Unhandled Rejection at:', promise, 'reason:', reason);
+process.on("unhandledRejection", (reason, promise) => {
+    console.error("Unhandled Rejection at:", promise, "reason:", reason);
 });
 
 // Start the agent
@@ -280,60 +295,7 @@ console.log(`🏷️  Agent ID: ${AGENT_ID}`);
 console.log(`🌐 Backend URL: ${BACKEND_WS_URL}`);
 
 // Save agent ID to file for persistence
-const agentIdFile = path.join(__dirname, 'agent-id.txt');
+const agentIdFile = path.join(__dirname, "agent-id.txt");
 fs.writeFileSync(agentIdFile, AGENT_ID);
 
 initializeConnection();
-=======
-// agent-app/index.js
-require("dotenv").config(); // <-- load .env first
-const io = require("socket.io-client");
-
-const AGENT_ID = process.env.AGENT_ID || "agent_12345";
-const BACKEND_WS_URL = process.env.BACKEND_WS_URL || "http://localhost:3001";
-const TELEMETRY_INTERVAL = process.env.TELEMETRY_INTERVAL || 30000;
-
-const socket = io(BACKEND_WS_URL);
-
-// Register agent on connect
-socket.on("connect", () => {
-    console.log(`✅ Agent ${AGENT_ID} connected to backend WebSocket`);
-    socket.emit("registerAgent", AGENT_ID);
-});
-
-// Listen for commands
-socket.on("command", (data) => {
-    console.log(`📥 Received command: ${data.type}`, data.payload);
-
-    // TODO: implement actual attack simulation
-    if (data.type === "execute_phishing_action") {
-        console.log("Simulating phishing action...");
-
-        // Report back result
-        socket.emit("attackOutcome", {
-            simulationId: data.payload.simulationId,
-            agentId: AGENT_ID,
-            outcome: "success",
-            details: "Phishing simulated successfully"
-        });
-    }
-});
-
-// Telemetry heartbeat
-setInterval(() => {
-    socket.emit("telemetry", {
-        agentId: AGENT_ID,
-        cpuUsage: Math.random() * 100,
-        memoryUsage: Math.random() * 100,
-        status: "active"
-    });
-}, TELEMETRY_INTERVAL);
-
-socket.on("disconnect", () => {
-    console.log(`❌ Agent ${AGENT_ID} disconnected from backend`);
-});
-
-socket.on("error", (err) => {
-    console.error("⚠️ WebSocket error:", err);
-});
->>>>>>> origin/main
