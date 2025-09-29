@@ -57,12 +57,12 @@ const validateCampaignData = (data, isEdit = false) => {
         throw new ValidationError("Campaign type is required.");
     }
 
-    const validTypes = ["Phishing", "USB", "Social Engineering", "Physical", "Other"];
+    const validTypes = ["phishing", "social_engineering", "malware", "mixed"];
     if (type && !validTypes.includes(type)) {
         throw new ValidationError(`Invalid campaign type. Must be one of: ${validTypes.join(", ")}`);
     }
 
-    const validStatuses = ["DRAFT", "SCHEDULED", "RUNNING", "COMPLETED", "CANCELLED"];
+    const validStatuses = ["draft", "scheduled", "running", "completed", "paused", "cancelled"];
     if (status && !validStatuses.includes(status)) {
         throw new ValidationError(`Invalid campaign status. Must be one of: ${validStatuses.join(", ")}`);
     }
@@ -85,18 +85,22 @@ const validateCampaignData = (data, isEdit = false) => {
 // Validate Simulation CRUD Data (UPDATED WITH CAMPAIGN SUPPORT)
 // -----------------------------
 const validateSimulationData = (data, isEdit = false) => {
-    const { name, targetStaffId, status, campaign_id } = data;
+    const { name, type, status, campaign_id } = data;
 
     if (!isEdit && !name) {
         throw new ValidationError("Simulation name is required.");
     }
-    if (!isEdit && !targetStaffId) {
-        throw new ValidationError("Target staff ID is required.");
-    }
 
-    const validStatuses = ["pending", "running", "completed", "failed"];
+    // targetStaffId is not required for basic simulation creation - can be configured later
+
+    const validStatuses = ["draft", "scheduled", "running", "completed", "failed", "cancelled"];
     if (status && !validStatuses.includes(status)) {
         throw new ValidationError(`Invalid simulation status. Must be one of: ${validStatuses.join(", ")}`);
+    }
+
+    const validTypes = ["phishing", "social_engineering", "malware", "custom"];
+    if (type && !validTypes.includes(type)) {
+        throw new ValidationError(`Invalid simulation type. Must be one of: ${validTypes.join(", ")}`);
     }
 
     // campaign_id is optional but if provided, should be a positive integer
@@ -111,17 +115,22 @@ const validateSimulationData = (data, isEdit = false) => {
 // Validate Start Simulation Request (UPDATED WITH CAMPAIGN SUPPORT)
 // -----------------------------
 const validateSimulationStartData = (data) => {
-    const { name, targetStaffId, attackScriptId, campaign_id } = data;
+    const { name, targetStaffId, targetAgentId, attackScriptId, campaign_id } = data;
 
-    if (!name) {
-        throw new ValidationError("Simulation name is required to start.");
+    // Name can be auto-generated if not provided
+    // if (!name) {
+    //     throw new ValidationError("Simulation name is required to start.");
+    // }
+
+    // At least one target should be specified
+    if (!targetStaffId && !targetAgentId) {
+        throw new ValidationError("Either target staff ID or target agent ID is required.");
     }
-    if (!targetStaffId) {
-        throw new ValidationError("Target staff ID is required.");
-    }
-    if (!attackScriptId) {
-        throw new ValidationError("Attack script ID is required.");
-    }
+
+    // Attack script ID is optional, will default to 'default_phishing_script'
+    // if (!attackScriptId) {
+    //     throw new ValidationError("Attack script ID is required.");
+    // }
 
     // campaign_id is optional but if provided, should be a positive integer
     if (campaign_id !== undefined && campaign_id !== null) {
@@ -150,7 +159,7 @@ const validateAttackLogData = (data) => {
         throw new ValidationError("status is required in attack log.");
     }
 
-    const validStatuses = ["pending", "running", "completed", "failed"];
+    const validStatuses = ["draft", "scheduled", "running", "completed", "failed", "cancelled"];
     if (!validStatuses.includes(status)) {
         throw new ValidationError(`Invalid status. Must be one of: ${validStatuses.join(", ")}`);
     }

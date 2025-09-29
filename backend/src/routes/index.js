@@ -30,4 +30,7 @@ router.use("/phishing-emails", require("./phishingEmailRoutes"));
 // System Health and Metrics API
 router.use("/system", require("./systemRoutes"));
 
+// Telemetry API
+router.use("/telemetry", require("./telemetryRoutes"));
+
 module.exports = router;

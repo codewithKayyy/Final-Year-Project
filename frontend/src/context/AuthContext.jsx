@@ -11,23 +11,27 @@ export const AuthProvider = ({ children }) => {
     useEffect(() => {
         const checkAuthStatus = () => {
             try {
-                const storedUser = authService.getCurrentUser();
-                console.log("Checking stored user:", storedUser);
+                // TEMPORARY: Auto-authenticate as tester411 user to bypass login
+                const mockUser = {
+                    id: 5,
+                    username: 'tester411',
+                    email: 'tester4111@gmail.com',
+                    role: 'admin'
+                };
 
-                // Validate that the stored user has required properties
-                // Your backend returns: { message, user: {...}, token }
-                if (storedUser && storedUser.token && storedUser.user) {
-                    setUser(storedUser.user); // Set the user object, not the whole response
-                } else {
-                    // Clear invalid user data
-                    if (storedUser) {
-                        authService.logout();
-                    }
-                    setUser(null);
-                }
+                console.log("🚫 BYPASSING LOGIN - Auto-authenticating as tester411");
+                setUser(mockUser);
+
+                // Store mock auth data in localStorage
+                const mockAuthData = {
+                    message: "Login successful",
+                    user: mockUser,
+                    token: "mock-token-bypass"
+                };
+                localStorage.setItem("user", JSON.stringify(mockAuthData));
+
             } catch (error) {
-                console.error("Error checking auth status:", error);
-                authService.logout();
+                console.error("Error in bypass auth:", error);
                 setUser(null);
             } finally {
                 setLoading(false);

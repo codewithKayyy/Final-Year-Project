@@ -82,6 +82,21 @@ class Agent {
         return result;
     }
 
+    /**
+     * Update only the staff assignment for an agent
+     */
+    static async updateStaffAssignment(id, staff_id) {
+        const query = `
+            UPDATE agents
+            SET staff_id = ?, updated_at = CURRENT_TIMESTAMP
+            WHERE id = ?
+        `;
+
+        const params = [staff_id || null, id];
+        const [result] = await db.execute(query, params);
+        return result;
+    }
+
 
     /**
      * Update agent telemetry (called by agent software on heartbeat)

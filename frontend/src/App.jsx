@@ -14,6 +14,7 @@ import AgentManagement from "./pages/AgentManagement";
 import AttackLogs from "./pages/AttackLogs";
 import SecurityControls from "./pages/SecurityControls";
 import Settings from "./pages/Settings";
+import PhishingTemplates from "./pages/PhishingTemplates";
 import Auth from "./pages/Auth";
 
 const App = () => {
@@ -36,6 +37,7 @@ const App = () => {
                         <Route path="/simulations" element={<SimulationManagement />} />
                         <Route path="/simulation-config" element={<SimulationConfig />} />
                         <Route path="/simulation-config/:id" element={<SimulationConfig />} />
+                        <Route path="/email-templates" element={<PhishingTemplates />} />
                         <Route path="/attack-logs" element={<AttackLogs />} />
                         <Route path="/security-controls" element={<SecurityControls />} />
                         <Route path="/settings" element={<Settings />} />

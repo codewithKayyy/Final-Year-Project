@@ -6,7 +6,7 @@ exports.getAllCampaigns = async (req, res) => {
         const campaigns = await Campaign.getAll();
         res.json(campaigns);
     } catch (err) {
-        console.error("❌ Get all campaigns failed:", err);
+        console.error("Get all campaigns failed:", err);
         res.status(500).json({ error: "Failed to retrieve campaigns" });
     }
 };

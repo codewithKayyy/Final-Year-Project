@@ -12,6 +12,7 @@ router.get("/unassigned", agentController.getUnassignedAgents);
 router.get("/staff/:staffId", agentController.getAgentsByStaff);
 router.get("/:id", agentController.getAgentById);
 router.put("/:id", agentController.updateAgent);
+router.put("/:id/assign-staff", agentController.assignStaffToAgent);
 router.delete("/:id", agentController.deactivateAgent);
 
 module.exports = router;

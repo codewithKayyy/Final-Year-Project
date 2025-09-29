@@ -8,10 +8,18 @@ const { notifySimulationUpdate } = require("../services/simulationService");
 
 // ----------------- CRUD ROUTES (ENHANCED WITH CAMPAIGN SUPPORT) -----------------
 
-// GET all simulations (with campaign info)
+// GET all simulations (with campaign info and optional filtering)
 router.get("/", async (req, res, next) => {
     try {
-        const simulations = await Simulation.getAll();
+        const { campaign } = req.query;
+
+        let simulations;
+        if (campaign) {
+            simulations = await Simulation.getByCampaignId(campaign);
+        } else {
+            simulations = await Simulation.getAll();
+        }
+
         res.json(simulations);
     } catch (error) {
         next(error);

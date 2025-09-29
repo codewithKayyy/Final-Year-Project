@@ -5,6 +5,7 @@ import {
     DialogContent,
     DialogHeader,
     DialogTitle,
+    DialogDescription,
     DialogFooter,
 } from "../ui/dialog";
 import { Button } from "../ui/button";
@@ -35,6 +36,9 @@ const AssignStaffModal = ({ agent, staffList, onClose, onAssigned }) => {
                         Assign Staff to{" "}
                         <span className="font-semibold">{agent.agent_name || "Agent"}</span>
                     </DialogTitle>
+                    <DialogDescription>
+                        Select a staff member to assign to this agent for simulation activities.
+                    </DialogDescription>
                 </DialogHeader>
 
                 <form onSubmit={handleSubmit} className="mt-4 space-y-4">

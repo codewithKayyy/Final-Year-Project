@@ -10,22 +10,41 @@ router.post("/start", async (req, res, next) => {
     try {
         validateSimulationStartData(req.body);
 
-        const { name, targetStaffId, attackScriptId, attackParams, campaign_id } = req.body;
-
-        // Create simulation record in DB with campaign_id
-        const newSimulation = await Simulation.create({
+        const {
             name,
             targetStaffId,
+            targetAgentId,
+            attackScriptId,
+            attackParams,
+            campaign_id,
+            simulationId
+        } = req.body;
+
+        // Handle both targetStaffId and targetAgentId parameters
+        const staffId = targetStaffId || null;
+        const agentId = targetAgentId || null;
+        const scriptId = attackScriptId || 'default_phishing_script';
+        const params = attackParams || {};
+
+        // Create simulation record in DB with campaign_id
+        const simulationName = name || `Simulation ${new Date().toISOString().slice(0, 19).replace('T', ' ')}`;
+        const newSimulation = await Simulation.create({
+            name: simulationName,
+            description: null,
+            scheduled_start: null,
+            actual_start: null,
+            status: "scheduled",
+            created_by: 1,
             campaign_id: campaign_id || null,
-            status: "pending"
+            type: "phishing"
         });
 
         // Trigger the attack executor service
         const attackJobResult = await triggerAttackExecution(
-            attackScriptId,
-            attackParams,
+            scriptId,
+            params,
             newSimulation.id,
-            targetStaffId
+            staffId || agentId
         );
 
         res.status(200).json({
@@ -36,6 +55,7 @@ router.post("/start", async (req, res, next) => {
         });
 
     } catch (error) {
+        console.error("Error starting simulation:", error);
         next(error);
     }
 });

@@ -9,6 +9,7 @@ import {
     FaCog,
     FaShieldAlt,
     FaBullhorn,
+    FaEnvelope,
 } from 'react-icons/fa';
 
 const Sidebar = () => {
@@ -19,7 +20,8 @@ const Sidebar = () => {
         { name: 'Staff Management', icon: FaUsers, path: '/staff' },
         { name: 'Agent Management', icon: FaRobot, path: '/agents' },
         { name: 'Campaign Management', icon: FaBullhorn, path: '/campaigns' },
-        { name: 'Simulation Config', icon: FaFlask, path: '/simulations' },
+        { name: 'Simulation Management', icon: FaFlask, path: '/simulations' },
+        { name: 'Email Templates', icon: FaEnvelope, path: '/email-templates' },
         { name: 'Attack Logs', icon: FaClipboardList, path: '/attack-logs' },
         { name: 'Security Controls', icon: FaShieldAlt, path: '/security-controls' },
         { name: 'Settings', icon: FaCog, path: '/settings' },

@@ -7,11 +7,12 @@ import {
 } from "../components/ui/card";
 import { Button } from "../components/ui/button";
 import { Badge } from "../components/ui/badge";
-import { FaRobot, FaSearch, FaUserPlus, FaTrash, FaCircle, FaDesktop, FaSyncAlt } from "react-icons/fa";
+import { FaRobot, FaSearch, FaUserPlus, FaTrash, FaCircle, FaDesktop, FaSyncAlt, FaChartLine } from "react-icons/fa";
 import { getAgents, deleteAgent, assignStaffToAgent } from "../services/agentService";
 import { getStaff } from "../services/staffService";
 import { socket } from "../services/socket";
 import AssignStaffModal from "../components/agents/AssignStaffModal";
+import TelemetryModal from "../components/agents/TelemetryModal";
 
 const AgentManagement = () => {
     const [agents, setAgents] = useState([]);
@@ -19,6 +20,7 @@ const AgentManagement = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
     const [modalAgent, setModalAgent] = useState(null);
+    const [telemetryAgent, setTelemetryAgent] = useState(null);
     const [searchTerm, setSearchTerm] = useState("");
     const [statusFilter, setStatusFilter] = useState("all");
 
@@ -285,10 +287,13 @@ const AgentManagement = () => {
                                         {agent.last_seen ? new Date(agent.last_seen).toLocaleString() : "Never"}
                                     </td>
                                     <td className="px-4 py-2 flex gap-2">
-                                        <Button size="sm" variant="secondary" onClick={() => setModalAgent(agent)}>
+                                        <Button size="sm" variant="outline" onClick={() => setTelemetryAgent(agent)} title="View Telemetry">
+                                            <FaChartLine />
+                                        </Button>
+                                        <Button size="sm" variant="secondary" onClick={() => setModalAgent(agent)} title="Assign Staff">
                                             <FaUserPlus />
                                         </Button>
-                                        <Button size="sm" variant="destructive" onClick={() => handleDelete(agent.id)}>
+                                        <Button size="sm" variant="destructive" onClick={() => handleDelete(agent.id)} title="Delete Agent">
                                             <FaTrash />
                                         </Button>
                                     </td>
@@ -310,7 +315,7 @@ const AgentManagement = () => {
                 </CardContent>
             </Card>
 
-            {/* Assign Staff Modal (kept as-is, should be refactored next if needed) */}
+            {/* Assign Staff Modal */}
             {modalAgent && (
                 <AssignStaffModal
                     agent={modalAgent}
@@ -319,6 +324,13 @@ const AgentManagement = () => {
                     onAssigned={fetchAgents}
                 />
             )}
+
+            {/* Telemetry Modal */}
+            <TelemetryModal
+                agent={telemetryAgent}
+                isOpen={!!telemetryAgent}
+                onClose={() => setTelemetryAgent(null)}
+            />
         </div>
     );
 };

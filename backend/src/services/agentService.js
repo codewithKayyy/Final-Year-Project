@@ -123,7 +123,6 @@ function sendSimulationToAgent(agentId, simulationData) {
 
 async function handleTelemetry(socket, data) {
     const agentId = socketToAgentMap.get(socket.id);
-    console.log(`📡 Telemetry from ${agentId || socket.id}:`, data);
 
     if (agentId) {
         try {

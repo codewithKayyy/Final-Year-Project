@@ -4,6 +4,7 @@ const jwt = require("jsonwebtoken");
 
 // Utility to generate JWT
 const generateToken = (id) => {
+    console.log("🔑 JWT_SECRET available:", !!process.env.JWT_SECRET);
     return jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn: "1h" });
 };
 
@@ -51,6 +52,7 @@ exports.createUser = async (req, res) => {
 // LOGIN
 exports.loginUser = async (req, res) => {
     try {
+        console.log("🔐 Login attempt for user:", req.body.username);
         const { username, password } = req.body;
 
         if (!username || !password) {
@@ -59,13 +61,18 @@ exports.loginUser = async (req, res) => {
 
         const user = await User.findByUsername(username);
         if (!user) {
+            console.log("❌ User not found:", username);
             return res.status(401).json({ error: "Incorrect username or password" });
         }
 
         const isMatch = await bcrypt.compare(password, user.password_hash);
         if (!isMatch) {
+            console.log("❌ Password mismatch for user:", username);
             return res.status(401).json({ error: "Incorrect username or password" });
         }
+
+        console.log("✅ Login successful for user:", username);
+        const token = generateToken(user.id);
 
         res.json({
             message: "Login successful",
@@ -75,10 +82,11 @@ exports.loginUser = async (req, res) => {
                 email: user.email,
                 role: user.role,
             },
-            token: generateToken(user.id),
+            token: token,
         });
     } catch (err) {
-        console.error("❌ Login failed:", err);
+        console.error("❌ Login failed with error:", err.message);
+        console.error("❌ Full error:", err);
         res.status(500).json({ error: "Login failed" });
     }
 };

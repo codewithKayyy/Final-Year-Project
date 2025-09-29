@@ -13,6 +13,7 @@ import {
     DialogContent,
     DialogHeader,
     DialogTitle,
+    DialogDescription,
     DialogFooter,
 } from "../components/ui/dialog.jsx"; // shadcn/ui uses radix under the hood
 
@@ -53,7 +54,7 @@ const StaffManagement = () => {
     const fetchStaff = async () => {
         try {
             setLoading(true);
-            const response = await api.get("/api/staff");
+            const response = await api.get("/staff");
             setStaff(response.data || []);
         } catch (err) {
             setError("Failed to fetch staff: " + err.message);
@@ -64,7 +65,7 @@ const StaffManagement = () => {
 
     const viewHistory = async (staffMember) => {
         try {
-            const response = await api.get(`/api/staff/${staffMember.id}/history`);
+            const response = await api.get(`/staff/${staffMember.id}/history`);
             setHistory(response.data || []);
             setSelectedStaff(staffMember);
             setShowHistoryModal(true);
@@ -114,9 +115,9 @@ const StaffManagement = () => {
         try {
             setSaveLoading(true);
             if (selectedStaff && selectedStaff.id) {
-                await api.put(`/api/staff/${selectedStaff.id}`, formData);
+                await api.put(`/staff/${selectedStaff.id}`, formData);
             } else {
-                await api.post("/api/staff", formData);
+                await api.post("/staff", formData);
             }
 
             await fetchStaff();
@@ -136,7 +137,7 @@ const StaffManagement = () => {
     const handleDelete = async (staffMember) => {
         if (!window.confirm(`Delete ${staffMember.name}?`)) return;
         try {
-            await api.delete(`/api/staff/${staffMember.id}`);
+            await api.delete(`/staff/${staffMember.id}`);
             await fetchStaff();
             setError(null);
         } catch (err) {
@@ -305,6 +306,9 @@ const StaffManagement = () => {
                     <DialogContent className="max-w-2xl p-6 bg-white rounded-xl shadow-lg">
                         <DialogHeader>
                             <DialogTitle>{showAddModal ? "Add Staff Member" : "Edit Staff Member"}</DialogTitle>
+                            <DialogDescription>
+                                {showAddModal ? "Enter the details for the new staff member." : "Update the staff member information."}
+                            </DialogDescription>
                         </DialogHeader>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
                             {["name","email","department","position","college","phone","location","manager_name"].map((field) => (
@@ -369,6 +373,9 @@ const StaffManagement = () => {
                     <DialogContent className="max-w-3xl p-6 bg-white rounded-xl shadow-lg">
                         <DialogHeader>
                             <DialogTitle>Simulation History - {selectedStaff?.name}</DialogTitle>
+                            <DialogDescription>
+                                View the simulation history and performance for this staff member.
+                            </DialogDescription>
                         </DialogHeader>
                         {history.length > 0 ? (
                             <table className="w-full text-sm mt-4">

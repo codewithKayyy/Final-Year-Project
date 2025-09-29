@@ -13,10 +13,10 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "dependencies": {
-    "socket.io-client": "^4.8.1",
-    "uuid": "^10.0.0",
     "dotenv": "^16.4.7",
-    "node-windows": "^1.0.0-beta.8"
+    "node-windows": "^1.0.0-beta.8",
+    "socket.io-client": "^4.8.1",
+    "uuid": "^10.0.0"
   },
   "pkg": {
     "targets": [

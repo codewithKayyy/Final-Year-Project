@@ -61,14 +61,51 @@ class Simulation {
      * Update simulation (with campaign_id support)
      */
     static async update(id, simulationData) {
-        const { name, description, scheduled_start, actual_start, status, campaign_id, type } = simulationData;
+        const { name, description, scheduled_start, actual_start, status, campaign_id, type, target_agents } = simulationData;
 
-        const [result] = await db.execute(
-            `UPDATE simulations
-             SET name = ?, description = ?, scheduled_start = ?, actual_start = ?, status = ?, campaign_id = ?, type = ?, updated_at = CURRENT_TIMESTAMP
-             WHERE id = ?`,
-            [name, description, scheduled_start, actual_start, status, campaign_id || null, type || "phishing", id]
-        );
+        // Build dynamic query based on provided fields
+        const updates = [];
+        const params = [];
+
+        if (name !== undefined) {
+            updates.push('name = ?');
+            params.push(name);
+        }
+        if (description !== undefined) {
+            updates.push('description = ?');
+            params.push(description);
+        }
+        if (scheduled_start !== undefined) {
+            updates.push('scheduled_start = ?');
+            params.push(scheduled_start || null);
+        }
+        if (actual_start !== undefined) {
+            updates.push('actual_start = ?');
+            params.push(actual_start || null);
+        }
+        if (status !== undefined) {
+            updates.push('status = ?');
+            params.push(status);
+        }
+        if (campaign_id !== undefined) {
+            updates.push('campaign_id = ?');
+            params.push(campaign_id || null);
+        }
+        if (type !== undefined) {
+            updates.push('type = ?');
+            params.push(type);
+        }
+        if (target_agents !== undefined) {
+            updates.push('target_agents = ?');
+            params.push(target_agents);
+        }
+
+        // Always update the timestamp
+        updates.push('updated_at = CURRENT_TIMESTAMP');
+        params.push(id);
+
+        const query = `UPDATE simulations SET ${updates.join(', ')} WHERE id = ?`;
+        const [result] = await db.execute(query, params);
 
         return result;
     }
