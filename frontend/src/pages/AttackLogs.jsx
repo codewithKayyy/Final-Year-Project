@@ -1,4 +1,4 @@
-<<<<<<< HEAD
+// frontend/src/pages/AttackLogs.jsx
 import React, { useEffect, useState } from "react";
 import {
     Table,
@@ -10,13 +10,17 @@ import {
 } from "../components/ui/table";
 import { Card, CardHeader, CardTitle, CardContent } from "../components/ui/card";
 import { Badge } from "../components/ui/badge";
+import Modal from "../components/common/Modal";
 import { getAttackLogs } from "../services/attackLogService";
 import { socket } from "../services/socket";
+import { FaEye } from "react-icons/fa";
 
 const AttackLogs = () => {
     const [logs, setLogs] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
+    const [showDetailsModal, setShowDetailsModal] = useState(false);
+    const [selectedLog, setSelectedLog] = useState(null);
 
     const fetchLogs = async () => {
         setLoading(true);
@@ -26,41 +30,26 @@ const AttackLogs = () => {
             setError("");
         } catch (err) {
             setError(err.message || "Failed to fetch attack logs");
-=======
-import React, { useEffect, useState } from 'react';
-import { getAttackLogs } from '../services/attackLogService';
-import Modal from '../components/common/Modal';
-
-const AttackLogs = () => {
-    const [attackLogs, setAttackLogs] = useState([]);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
-    const [showDetailsModal, setShowDetailsModal] = useState(false);
-    const [selectedLog, setSelectedLog] = useState(null);
-
-    const fetchAttackLogs = async () => {
-        try {
-            setLoading(true);
-            const data = await getAttackLogs();
-            setAttackLogs(data);
-        } catch (err) {
-            setError('Failed to fetch attack logs: ' + err.message);
->>>>>>> origin/main
         } finally {
             setLoading(false);
         }
     };
 
     useEffect(() => {
-<<<<<<< HEAD
         fetchLogs();
 
+        // Real-time update
         socket.on("attackExecuted", (log) => {
             setLogs((prev) => [log, ...prev]);
         });
 
         return () => socket.off("attackExecuted");
     }, []);
+
+    const handleViewDetails = (log) => {
+        setSelectedLog(log);
+        setShowDetailsModal(true);
+    };
 
     return (
         <Card className="shadow-md">
@@ -90,8 +79,8 @@ const AttackLogs = () => {
                                     <TableHead>Attack Type</TableHead>
                                     <TableHead>Target</TableHead>
                                     <TableHead>Outcome</TableHead>
-                                    <TableHead>Details</TableHead>
-                                    <TableHead className="text-right">Timestamp</TableHead>
+                                    <TableHead>Timestamp</TableHead>
+                                    <TableHead className="text-center">Actions</TableHead>
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
@@ -107,19 +96,25 @@ const AttackLogs = () => {
                                                 className={
                                                     log.outcome === "success"
                                                         ? "bg-green-100 text-green-800"
-                                                        : "bg-red-100 text-red-800"
+                                                        : log.outcome === "failed"
+                                                            ? "bg-red-100 text-red-800"
+                                                            : "bg-gray-100 text-gray-800"
                                                 }
                                             >
                                                 {log.outcome}
                                             </Badge>
                                         </TableCell>
-                                        <TableCell>
-                                            {typeof log.details === "string"
-                                                ? log.details
-                                                : JSON.stringify(log.details)}
-                                        </TableCell>
-                                        <TableCell className="text-right text-gray-600">
+                                        <TableCell className="text-gray-600">
                                             {new Date(log.timestamp).toLocaleString()}
+                                        </TableCell>
+                                        <TableCell className="text-center">
+                                            <button
+                                                onClick={() => handleViewDetails(log)}
+                                                className="w-8 h-8 rounded-full bg-blue-100 text-blue-600 hover:bg-blue-200 flex items-center justify-center transition-colors duration-200"
+                                                title="View Details"
+                                            >
+                                                <FaEye />
+                                            </button>
                                         </TableCell>
                                     </TableRow>
                                 ))}
@@ -132,80 +127,8 @@ const AttackLogs = () => {
                     </div>
                 )}
             </CardContent>
-        </Card>
-    );
-};
 
-export default AttackLogs;
-=======
-        fetchAttackLogs();
-    }, []);
-
-    const handleViewDetails = (log) => {
-        setSelectedLog(log);
-        setShowDetailsModal(true);
-    };
-
-    if (loading) return <div className="text-center py-8">Loading attack logs...</div>;
-    if (error) return <div className="text-center py-8 text-red-600">Error: {error}</div>;
-
-    return (
-        <div className="container mx-auto p-6 bg-white rounded-lg shadow-md">
-            <h1 className="text-3xl font-bold text-gray-800 mb-6">Attack Logs</h1>
-
-            {attackLogs.length === 0 ? (
-                <p className="text-gray-600">No attack logs found.</p>
-            ) : (
-                <div className="overflow-x-auto">
-                    <table className="min-w-full bg-white border border-gray-200 rounded-lg">
-                        <thead>
-                        <tr className="bg-gray-100 text-gray-600 uppercase text-sm leading-normal">
-                            <th className="py-3 px-6 text-left">ID</th>
-                            <th className="py-3 px-6 text-left">Simulation ID</th>
-                            <th className="py-3 px-6 text-left">Agent ID</th>
-                            <th className="py-3 px-6 text-left">Attack Type</th>
-                            <th className="py-3 px-6 text-left">Target</th>
-                            <th className="py-3 px-6 text-left">Outcome</th>
-                            <th className="py-3 px-6 text-left">Timestamp</th>
-                            <th className="py-3 px-6 text-center">Actions</th>
-                        </tr>
-                        </thead>
-                        <tbody className="text-gray-700 text-sm font-light">
-                        {attackLogs.map((log) => (
-                            <tr key={log.id} className="border-b border-gray-200 hover:bg-gray-50">
-                                <td className="py-3 px-6 text-left whitespace-nowrap">{log.id}</td>
-                                <td className="py-3 px-6 text-left">{log.simulation_id}</td>
-                                <td className="py-3 px-6 text-left">{log.agent_id}</td>
-                                <td className="py-3 px-6 text-left">{log.attack_type}</td>
-                                <td className="py-3 px-6 text-left">{log.target}</td>
-                                <td className="py-3 px-6 text-left">
-                    <span className={`py-1 px-3 rounded-full text-xs font-medium
-                      ${log.outcome === 'success' ? 'bg-green-200 text-green-800'
-                        : log.outcome === 'failed' ? 'bg-red-200 text-red-800'
-                            : 'bg-gray-200 text-gray-800'}`}>
-                      {log.outcome}
-                    </span>
-                                </td>
-                                <td className="py-3 px-6 text-left">{new Date(log.timestamp).toLocaleString()}</td>
-                                <td className="py-3 px-6 text-center">
-                                    <div className="flex item-center justify-center space-x-3">
-                                        <button
-                                            onClick={() => handleViewDetails(log)}
-                                            className="w-8 h-8 rounded-full bg-blue-100 text-blue-600 hover:bg-blue-200 flex items-center justify-center transition-colors duration-200"
-                                            title="View Details"
-                                        >
-                                            <FaEye />
-                                        </button>
-                                    </div>
-                                </td>
-                            </tr>
-                        ))}
-                        </tbody>
-                    </table>
-                </div>
-            )}
-
-            {/* Attack Log Details Modal */}
+            {/* Details Modal */}
             <Modal
                 isOpen={showDetailsModal}
                 onClose={() => setShowDetailsModal(false)}
@@ -221,13 +144,16 @@ export default AttackLogs;
                         <p><strong>Outcome:</strong> {selectedLog.outcome}</p>
                         <p><strong>Timestamp:</strong> {new Date(selectedLog.timestamp).toLocaleString()}</p>
                         <p><strong>Details:</strong></p>
-                        <pre className="bg-gray-100 p-3 rounded-md overflow-auto text-xs">{JSON.stringify(selectedLog.details, null, 2)}</pre>
+                        <pre className="bg-gray-100 p-3 rounded-md overflow-auto text-xs">
+                            {typeof selectedLog.details === "string"
+                                ? selectedLog.details
+                                : JSON.stringify(selectedLog.details, null, 2)}
+                        </pre>
                     </div>
                 )}
             </Modal>
-        </div>
+        </Card>
     );
 };
 
 export default AttackLogs;
->>>>>>> origin/main

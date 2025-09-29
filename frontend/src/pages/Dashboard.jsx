@@ -1,4 +1,4 @@
-<<<<<<< HEAD
+// frontend/src/pages/Dashboard.jsx
 import React, { useState, useEffect } from "react";
 import {
     Card,
@@ -15,19 +15,15 @@ import {
     FaFlask,
     FaUsers,
     FaCheckCircle,
-    FaExclamationCircle,
-    FaServer,
-    FaDatabase,
-    FaCogs,
-    FaChartLine,
-    FaPlay,
-    FaPlus,
-    FaEye,
     FaClock,
     FaNetworkWired,
     FaChartPie,
     FaBell,
     FaRocket,
+    FaChartLine,
+    FaPlay,
+    FaPlus,
+    FaEye,
 } from "react-icons/fa";
 import { socket } from "../services/socket";
 import api from "../services/api";
@@ -76,50 +72,45 @@ const Dashboard = () => {
                 ]);
 
             const agents = agentsRes.data || [];
-            const agentMetrics = {
-                online: agents.filter((a) => a.status === "active").length,
-                offline: agents.filter((a) => a.status === "offline").length,
-                total: agents.length,
-            };
-
             const campaigns = campaignsRes.data || [];
-            const campaignMetrics = {
-                active: campaigns.filter((c) => c.status === "running").length,
-                completed: campaigns.filter((c) => c.status === "completed").length,
-                total: campaigns.length,
-            };
-
             const simulations = simulationsRes.data || [];
-            const simulationMetrics = {
-                running: simulations.filter((s) => s.status === "running").length,
-                completed: simulations.filter((s) => s.status === "completed").length,
-                total: simulations.length,
-            };
-
             const staff = staffRes.data || [];
-            const staffMetrics = {
-                total: staff.length,
-                targeted: staff.filter((s) => s.is_active).length,
-            };
+            const logs = logsRes.data || [];
 
             setMetrics({
-                agents: agentMetrics,
-                campaigns: campaignMetrics,
-                simulations: simulationMetrics,
-                staff: staffMetrics,
-                recentLogs: logsRes.data || [],
+                agents: {
+                    online: agents.filter((a) => a.status === "active").length,
+                    offline: agents.filter((a) => a.status === "offline").length,
+                    total: agents.length,
+                },
+                campaigns: {
+                    active: campaigns.filter((c) => c.status === "running").length,
+                    completed: campaigns.filter((c) => c.status === "completed").length,
+                    total: campaigns.length,
+                },
+                simulations: {
+                    running: simulations.filter((s) => s.status === "running").length,
+                    completed: simulations.filter((s) => s.status === "completed").length,
+                    total: simulations.length,
+                },
+                staff: {
+                    total: staff.length,
+                    targeted: staff.filter((s) => s.is_active).length,
+                },
+                recentLogs: logs,
             });
 
             setSystemHealth(healthRes.data || systemHealth);
 
-            const activity = (logsRes.data || []).slice(0, 5).map((log) => ({
-                id: log.id,
-                type: "simulation",
-                message: `${log.attack_type} simulation ${log.outcome} on agent ${log.agent_id}`,
-                timestamp: log.timestamp,
-                status: log.outcome,
-            }));
-            setRecentActivity(activity);
+            setRecentActivity(
+                logs.slice(0, 5).map((log) => ({
+                    id: log.id,
+                    type: "simulation",
+                    message: `${log.attack_type} simulation ${log.outcome} on agent ${log.agent_id}`,
+                    timestamp: log.timestamp,
+                    status: log.outcome,
+                }))
+            );
         } catch (error) {
             console.error("Failed to fetch dashboard data:", error);
         } finally {
@@ -180,9 +171,7 @@ const Dashboard = () => {
             ]);
         });
 
-        socket.on("campaignUpdate", () => {
-            fetchDashboardData();
-        });
+        socket.on("campaignUpdate", fetchDashboardData);
 
         socket.on("systemHealthUpdate", (data) => {
             setSystemHealth(data);
@@ -215,9 +204,7 @@ const Dashboard = () => {
             {/* Header */}
             <div className="flex justify-between items-center">
                 <div>
-                    <h1 className="text-3xl font-bold text-gray-800">
-                        Dashboard
-                    </h1>
+                    <h1 className="text-3xl font-bold text-gray-800">Dashboard</h1>
                     <p className="text-gray-500 text-sm flex items-center gap-1">
                         <FaClock /> Real-time monitoring of your cybersecurity simulation
                         platform
@@ -278,8 +265,8 @@ const Dashboard = () => {
                             <div className="flex justify-between">
                                 {card.details.map((d, j) => (
                                     <span key={j} className={`text-sm ${d.color}`}>
-                    {d.value} {d.label}
-                  </span>
+                                        {d.value} {d.label}
+                                    </span>
                                 ))}
                             </div>
                         </CardContent>
@@ -307,8 +294,8 @@ const Dashboard = () => {
                                         <div>
                                             <p className="text-sm font-medium">{a.message}</p>
                                             <span className="text-xs text-gray-500">
-                        {new Date(a.timestamp).toLocaleString()}
-                      </span>
+                                                {new Date(a.timestamp).toLocaleString()}
+                                            </span>
                                         </div>
                                     </div>
                                     <Badge>{a.status}</Badge>
@@ -339,8 +326,8 @@ const Dashboard = () => {
                                             value
                                         )} text-white`}
                                     >
-                    {value}
-                  </span>
+                                        {value}
+                                    </span>
                                 </div>
                             ))}
                         </CardContent>
@@ -353,13 +340,24 @@ const Dashboard = () => {
                             </CardTitle>
                         </CardHeader>
                         <CardContent className="space-y-3">
-                            <Button className="w-full flex gap-2" onClick={() => (window.location.href = "/simulation-config")}>
+                            <Button
+                                className="w-full flex gap-2"
+                                onClick={() => (window.location.href = "/simulation-config")}
+                            >
                                 <FaPlay /> Start New Simulation
                             </Button>
-                            <Button variant="outline" className="w-full flex gap-2" onClick={() => (window.location.href = "/campaigns")}>
+                            <Button
+                                variant="outline"
+                                className="w-full flex gap-2"
+                                onClick={() => (window.location.href = "/campaigns")}
+                            >
                                 <FaPlus /> Create Campaign
                             </Button>
-                            <Button variant="outline" className="w-full flex gap-2" onClick={() => (window.location.href = "/agents")}>
+                            <Button
+                                variant="outline"
+                                className="w-full flex gap-2"
+                                onClick={() => (window.location.href = "/agents")}
+                            >
                                 <FaEye /> View Agents
                             </Button>
                         </CardContent>
@@ -398,22 +396,8 @@ const Dashboard = () => {
                     </div>
                 </CardContent>
             </Card>
-=======
-import React from 'react';
-
-const Dashboard = () => {
-    return (
-        <div className="container mx-auto">
-            <h1 className="text-3xl font-bold text-gray-800 mb-6">Dashboard Overview</h1>
-            <p className="text-gray-600">Welcome to your Cybersecurity Simulation Platform dashboard. Here you can see a summary of your simulations, agents, and recent activities.</p>
-            {/* Add dashboard widgets here */}
->>>>>>> origin/main
         </div>
     );
 };
 
-<<<<<<< HEAD
 export default Dashboard;
-=======
-export default Dashboard;
->>>>>>> origin/main

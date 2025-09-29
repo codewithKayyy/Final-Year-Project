@@ -1,14 +1,12 @@
 // backend/src/models/Telemetry.js
-<<<<<<< HEAD
-const db = require("../config/db");
-=======
 const db = require("../services/db");
->>>>>>> origin/main
 
 const Telemetry = {
+    /**
+     * Save telemetry data from an agent
+     */
     async save(agentId, data) {
         const query = `
-<<<<<<< HEAD
             INSERT INTO telemetry (
                 agent_id, hostname, platform, arch, node_version, uptime,
                 cpu_count, cpu_model, load_average, total_memory_mb,
@@ -16,7 +14,7 @@ const Telemetry = {
             )
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         `;
-        await db.execute(query, [
+        await db.query(query, [
             agentId,
             data.hostname || null,
             data.platform || null,
@@ -34,6 +32,9 @@ const Telemetry = {
         ]);
     },
 
+    /**
+     * Get telemetry logs for a specific agent
+     */
     async getByAgent(agentId, limit = 100) {
         const query = `
             SELECT * FROM telemetry
@@ -41,29 +42,19 @@ const Telemetry = {
             ORDER BY timestamp DESC
             LIMIT ?
         `;
-        const [rows] = await db.execute(query, [agentId, limit]);
-        return rows;
+        return await db.query(query, [agentId, limit]);
     },
 
+    /**
+     * Get the latest telemetry logs across all agents
+     */
     async getLatest(limit = 50) {
         const query = `
             SELECT * FROM telemetry
             ORDER BY timestamp DESC
             LIMIT ?
         `;
-        const [rows] = await db.execute(query, [limit]);
-        return rows;
-=======
-            INSERT INTO telemetry (agent_id, cpu, memory, network, timestamp)
-            VALUES (?, ?, ?, ?, NOW())
-        `;
-        await db.query(query, [
-            agentId,
-            data.cpu || null,
-            data.memory || null,
-            data.network || null
-        ]);
->>>>>>> origin/main
+        return await db.query(query, [limit]);
     }
 };
 

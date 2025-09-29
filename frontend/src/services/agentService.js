@@ -1,21 +1,3 @@
-<<<<<<< HEAD
-import api from './api';
-
-export const getAgents = async () => {
-    const response = await api.get('/agents');
-    return response.data;
-};
-
-export const deleteAgent = async (id) => {
-    const response = await api.delete(`/agents/${id}`);
-    return response.data;
-};
-
-export const assignStaffToAgent = async (agentId, staffId) => {
-    const response = await api.put(`/agents/${agentId}/assign-staff`, { staffId });
-    return response.data;
-};
-=======
 // frontend/src/services/agentService.js
 import api from "./api"; // reuse axios instance
 
@@ -69,5 +51,24 @@ const deleteAgent = async (id) => {
     }
 };
 
-export { getAgents, getAgentById, createAgent, updateAgent, deleteAgent };
->>>>>>> origin/main
+const assignStaffToAgent = async (agentId, staffId) => {
+    try {
+        const response = await api.put(`/agents/${agentId}/assign-staff`, { staffId });
+        return response.data;
+    } catch (error) {
+        console.error(
+            `Error assigning staff ID ${staffId} to agent ID ${agentId}:`,
+            error.response?.data || error.message
+        );
+        throw error;
+    }
+};
+
+export {
+    getAgents,
+    getAgentById,
+    createAgent,
+    updateAgent,
+    deleteAgent,
+    assignStaffToAgent,
+};

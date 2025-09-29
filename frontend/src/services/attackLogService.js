@@ -1,12 +1,4 @@
 // frontend/src/services/attackLogService.js
-<<<<<<< HEAD
-import api from './api';
-
-export const getAttackLogs = async () => {
-    const response = await api.get('/attack-logs');
-    return response.data;
-};
-=======
 import api from "./api"; // reuse axios instance
 
 const getAttackLogs = async () => {
@@ -49,5 +41,9 @@ const getAttackLogsByAgentId = async (agentId) => {
     }
 };
 
-export { getAttackLogs, getAttackLogById, getAttackLogsBySimulationId, getAttackLogsByAgentId };
->>>>>>> origin/main
+export {
+    getAttackLogs,
+    getAttackLogById,
+    getAttackLogsBySimulationId,
+    getAttackLogsByAgentId,
+};

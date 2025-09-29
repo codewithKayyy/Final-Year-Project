@@ -1,5 +1,4 @@
 // frontend/src/components/common/ProtectedRoute.jsx
-<<<<<<< HEAD
 import React from "react";
 import { Navigate, Outlet } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
@@ -7,7 +6,7 @@ import { useAuth } from "../../context/AuthContext";
 const ProtectedRoute = () => {
     const { user, loading, isAuthenticated } = useAuth();
 
-    console.log("ProtectedRoute - User:", user, "Loading:", loading, "IsAuthenticated:", isAuthenticated);
+    console.log("🔐 ProtectedRoute - User:", user, "Loading:", loading, "isAuthenticated:", isAuthenticated);
 
     if (loading) {
         return (
@@ -20,8 +19,8 @@ const ProtectedRoute = () => {
         );
     }
 
-    if (!isAuthenticated) {
-        console.log("Not authenticated, redirecting to login");
+    if (!user || !isAuthenticated) {
+        console.warn("Not authenticated, redirecting to login");
         return <Navigate to="/login" replace />;
     }
 
@@ -30,20 +29,3 @@ const ProtectedRoute = () => {
 };
 
 export default ProtectedRoute;
-=======
-import React from 'react';
-import { Navigate, Outlet } from 'react-router-dom';
-import { useAuth } from '../../context/AuthContext';
-
-const ProtectedRoute = () => {
-    const { user, loading } = useAuth();
-
-    if (loading) {
-        return <div className="text-center py-8">Loading authentication...</div>; // Or a spinner
-    }
-
-    return user ? <Outlet /> : <Navigate to="/login" replace />;
-};
-
-export default ProtectedRoute;
->>>>>>> origin/main

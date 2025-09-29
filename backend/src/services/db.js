@@ -4,16 +4,13 @@ const mysql = require("mysql2/promise");
 // Create a connection pool for MySQL
 const pool = mysql.createPool({
     host: process.env.DB_HOST || "localhost",
-<<<<<<< HEAD
-    //port: Number(process.env.DB_PORT || 3306),
-=======
->>>>>>> origin/main
+    port: Number(process.env.DB_PORT || 3306),
     user: process.env.DB_USER || "root",
     password: process.env.DB_PASSWORD || "#2003Hero#",
     database: process.env.DB_NAME || "cybersecurity",
     waitForConnections: true,
     connectionLimit: 10,
-    queueLimit: 0
+    queueLimit: 0,
 });
 
 /**
@@ -36,5 +33,5 @@ async function query(sql, params) {
 module.exports = {
     pool,
     query,
-    getConnection
+    getConnection,
 };

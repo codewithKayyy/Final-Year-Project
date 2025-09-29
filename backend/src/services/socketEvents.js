@@ -18,27 +18,24 @@ function attachSocketEvents(io) {
         console.log(`🔌 Client connected: ${socket.id}`);
 
         // ─── 1. Agent Registration ───────────────────────────────
-<<<<<<< HEAD
         socket.on("registerAgent", async (registrationData) => {
             // Handle both old format (string) and new format (object)
-            const agentData = typeof registrationData === 'string'
+            const agentData = typeof registrationData === "string"
                 ? { agentId: registrationData }
                 : registrationData;
 
             await registerAgent(socket, agentData);
             notifyAgentStatus(agentData.agentId, "online"); // 🔔 Notify dashboards
-=======
-        socket.on("registerAgent", (agentId) => {
-            registerAgent(socket, agentId);
-            notifyAgentStatus(agentId, "online"); // 🔔 Notify dashboards
->>>>>>> origin/main
         });
 
         // ─── 2. Telemetry Data ──────────────────────────────────
         socket.on("telemetry", async (data) => {
             await handleTelemetry(socket, data);
             if (data.agentId) {
-                io.emit("agentTelemetryUpdate", { agentId: data.agentId, ...data });
+                io.emit("agentTelemetryUpdate", {
+                    agentId: data.agentId,
+                    ...data
+                });
             }
         });
 
@@ -52,16 +49,17 @@ function attachSocketEvents(io) {
             });
         });
 
-<<<<<<< HEAD
-        // ─── 4. Simulation Result (New Format) ─────────────────
+        // ─── 4. Simulation Result (New Format) ──────────────────
         socket.on("simulationResult", async (data) => {
-            console.log(`📊 Simulation result from ${data.agentId}:`, data);
+            console.log(`Simulation result from ${data.agentId}:`, data);
+
             await handleAttackOutcome(socket, {
                 simulationId: data.simulationId,
                 agentId: data.agentId,
                 outcome: data.status,
                 details: data.details
             });
+
             notifySimulationUpdate(data.simulationId, {
                 status: data.status,
                 agentId: data.agentId,
@@ -71,32 +69,25 @@ function attachSocketEvents(io) {
 
         // ─── 5. Agent Control Events ─────────────────────────────
         socket.on("pong", (data) => {
-            console.log(`🏓 Pong from ${data.agentId} at ${data.timestamp}`);
+            console.log(`Pong from ${data.agentId} at ${data.timestamp}`);
         });
 
         socket.on("agentShutdown", (data) => {
-            console.log(`🛑 Agent ${data.agentId} shutting down at ${data.timestamp}`);
+            console.log(`Agent ${data.agentId} shutting down at ${data.timestamp}`);
             unregisterAgent(socket.id);
             notifyAgentStatus(data.agentId, "offline");
         });
 
         // ─── 6. Disconnect ──────────────────────────────────────
-=======
-        // ─── 4. Disconnect ──────────────────────────────────────
->>>>>>> origin/main
         socket.on("disconnect", () => {
             unregisterAgent(socket.id);
             const agentId = socket.handshake.query?.agentId;
             if (agentId) notifyAgentStatus(agentId, "offline");
         });
 
-<<<<<<< HEAD
         // ─── 7. Error Handler ───────────────────────────────────
-=======
-        // ─── 5. Error Handler ───────────────────────────────────
->>>>>>> origin/main
         socket.on("error", (err) => {
-            console.error(`⚠️ Socket error [${socket.id}]:`, err.message);
+            console.error(`Socket error [${socket.id}]:`, err.message);
         });
     });
 }

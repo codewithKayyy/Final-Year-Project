@@ -1,9 +1,7 @@
-<<<<<<< HEAD
+// frontend/src/pages/StaffManagement.jsx
 import React, { useEffect, useState } from "react";
 import {
     Card,
-    CardHeader,
-    CardTitle,
     CardContent,
 } from "../components/ui/card";
 import { Button } from "../components/ui/button";
@@ -16,7 +14,7 @@ import {
     DialogTitle,
     DialogDescription,
     DialogFooter,
-} from "../components/ui/dialog.jsx"; // shadcn/ui uses radix under the hood
+} from "../components/ui/dialog";
 
 const StaffManagement = () => {
     const [staff, setStaff] = useState([]);
@@ -303,7 +301,7 @@ const StaffManagement = () => {
 
             {/* Add/Edit Dialog */}
             {(showAddModal || showEditModal) && (
-                <Dialog open={showAddModal || showEditModal} onOpenChange={() => {setShowAddModal(false);setShowEditModal(false);}}>
+                <Dialog open={showAddModal || showEditModal} onOpenChange={() => { setShowAddModal(false); setShowEditModal(false); }}>
                     <DialogContent className="max-w-2xl p-6 bg-white rounded-xl shadow-lg">
                         <DialogHeader>
                             <DialogTitle>{showAddModal ? "Add Staff Member" : "Edit Staff Member"}</DialogTitle>
@@ -312,9 +310,9 @@ const StaffManagement = () => {
                             </DialogDescription>
                         </DialogHeader>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
-                            {["name","email","department","position","college","phone","location","manager_name"].map((field) => (
+                            {["name", "email", "department", "position", "college", "phone", "location", "manager_name"].map((field) => (
                                 <div key={field} className="flex flex-col">
-                                    <label className="text-sm font-medium mb-1 capitalize">{field.replace("_"," ")}</label>
+                                    <label className="text-sm font-medium mb-1 capitalize">{field.replace("_", " ")}</label>
                                     <input
                                         type="text"
                                         name={field}
@@ -359,7 +357,7 @@ const StaffManagement = () => {
                             </div>
                         </div>
                         <DialogFooter className="mt-6 flex justify-end gap-2">
-                            <Button variant="outline" onClick={() => {setShowAddModal(false);setShowEditModal(false);}}>Cancel</Button>
+                            <Button variant="outline" onClick={() => { setShowAddModal(false); setShowEditModal(false); }}>Cancel</Button>
                             <Button onClick={handleSave} disabled={saveLoading}>
                                 {saveLoading ? "Saving..." : (showAddModal ? "Add" : "Save")}
                             </Button>
@@ -414,22 +412,8 @@ const StaffManagement = () => {
                     </DialogContent>
                 </Dialog>
             )}
-=======
-import React from 'react';
-
-const StaffManagement = () => {
-    return (
-        <div className="container mx-auto">
-            <h1 className="text-3xl font-bold text-gray-800 mb-6">Staff Management Overview</h1>
-            <p className="text-gray-600">Welcome to your Cybersecurity Simulation Platform dashboard. Here you can see a summary of your simulations, agents, and recent activities.</p>
-            {/* Add dashboard widgets here */}
->>>>>>> origin/main
         </div>
     );
 };
 
-<<<<<<< HEAD
 export default StaffManagement;
-=======
-export default StaffManagement;
->>>>>>> origin/main
