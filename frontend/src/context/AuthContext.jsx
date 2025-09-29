@@ -1,6 +1,11 @@
 // frontend/src/context/AuthContext.jsx
+<<<<<<< HEAD
 import React, { createContext, useState, useEffect, useContext } from "react";
 import authService from "../services/authService";
+=======
+import React, { createContext, useState, useEffect, useContext } from 'react';
+import authService from '../services/authService';
+>>>>>>> origin/main
 
 const AuthContext = createContext(null);
 
@@ -9,6 +14,7 @@ export const AuthProvider = ({ children }) => {
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
+<<<<<<< HEAD
         const checkAuthStatus = () => {
             try {
                 // TEMPORARY: Auto-authenticate as tester411 user to bypass login
@@ -69,6 +75,25 @@ export const AuthProvider = ({ children }) => {
             console.error("Registration error:", error);
             throw error;
         }
+=======
+        const storedUser = authService.getCurrentUser();
+        if (storedUser) {
+            setUser(storedUser);
+        }
+        setLoading(false);
+    }, []);
+
+    const login = async (username, password) => {
+        const userData = await authService.login(username, password);
+        setUser(userData);
+        return userData;
+    };
+
+    const register = async (username, email, password) => {
+        const userData = await authService.register(username, email, password);
+        setUser(userData);
+        return userData;
+>>>>>>> origin/main
     };
 
     const logout = () => {
@@ -76,6 +101,7 @@ export const AuthProvider = ({ children }) => {
         setUser(null);
     };
 
+<<<<<<< HEAD
     const value = {
         user,
         login,
@@ -88,14 +114,25 @@ export const AuthProvider = ({ children }) => {
     return (
         <AuthContext.Provider value={value}>
             {children}
+=======
+    const value = { user, login, register, logout, loading };
+
+    return (
+        <AuthContext.Provider value={value}>
+            {!loading && children}
+>>>>>>> origin/main
         </AuthContext.Provider>
     );
 };
 
 export const useAuth = () => {
+<<<<<<< HEAD
     const context = useContext(AuthContext);
     if (!context) {
         throw new Error("useAuth must be used within an AuthProvider");
     }
     return context;
+=======
+    return useContext(AuthContext);
+>>>>>>> origin/main
 };

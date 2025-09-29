@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import React, { useState, useEffect } from "react";
 import {
     Card,
@@ -397,8 +398,22 @@ const Dashboard = () => {
                     </div>
                 </CardContent>
             </Card>
+=======
+import React from 'react';
+
+const Dashboard = () => {
+    return (
+        <div className="container mx-auto">
+            <h1 className="text-3xl font-bold text-gray-800 mb-6">Dashboard Overview</h1>
+            <p className="text-gray-600">Welcome to your Cybersecurity Simulation Platform dashboard. Here you can see a summary of your simulations, agents, and recent activities.</p>
+            {/* Add dashboard widgets here */}
+>>>>>>> origin/main
         </div>
     );
 };
 
+<<<<<<< HEAD
 export default Dashboard;
+=======
+export default Dashboard;
+>>>>>>> origin/main

@@ -1,5 +1,6 @@
 const User = require("../models/User");
 const bcrypt = require("bcryptjs");
+<<<<<<< HEAD
 const jwt = require("jsonwebtoken");
 
 // Utility to generate JWT
@@ -7,11 +8,14 @@ const generateToken = (id) => {
     console.log("🔑 JWT_SECRET available:", !!process.env.JWT_SECRET);
     return jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn: "1h" });
 };
+=======
+>>>>>>> origin/main
 
 // CREATE user (Register)
 exports.createUser = async (req, res) => {
     try {
         const { username, email, password, role } = req.body;
+<<<<<<< HEAD
 
         // Validate required fields
         if (!username || !email || !password) {
@@ -45,10 +49,19 @@ exports.createUser = async (req, res) => {
         });
     } catch (err) {
         console.error("❌ Create user failed:", err);
+=======
+        const password_hash = await bcrypt.hash(password, 10);
+
+        const result = await User.create({ username, email, password_hash, role });
+        res.status(201).json({ message: "User created", id: result.insertId });
+    } catch (err) {
+        console.error("❌ Create user failed:", err.message);
+>>>>>>> origin/main
         res.status(500).json({ error: "Failed to create user" });
     }
 };
 
+<<<<<<< HEAD
 // LOGIN
 exports.loginUser = async (req, res) => {
     try {
@@ -91,17 +104,25 @@ exports.loginUser = async (req, res) => {
     }
 };
 
+=======
+>>>>>>> origin/main
 // GET user by ID
 exports.getUserById = async (req, res) => {
     try {
         const user = await User.findById(req.params.id);
         if (!user) return res.status(404).json({ error: "User not found" });
+<<<<<<< HEAD
 
         // Hide password_hash in response
         const { password_hash, ...safeUser } = user;
         res.json(safeUser);
     } catch (err) {
         console.error("❌ Fetch user failed:", err);
+=======
+        res.json(user);
+    } catch (err) {
+        console.error("❌ Fetch user failed:", err.message);
+>>>>>>> origin/main
         res.status(500).json({ error: "Failed to fetch user" });
     }
 };
@@ -116,12 +137,19 @@ exports.updateUser = async (req, res) => {
             password_hash = await bcrypt.hash(password, 10);
         }
 
+<<<<<<< HEAD
         const safeRole = role || "admin";
 
         const result = await User.update(req.params.id, { username, email, password_hash, role: safeRole });
         res.json({ message: "User updated", affectedRows: result.affectedRows });
     } catch (err) {
         console.error("❌ Update user failed:", err);
+=======
+        const result = await User.update(req.params.id, { username, email, password_hash, role });
+        res.json({ message: "User updated", affectedRows: result.affectedRows });
+    } catch (err) {
+        console.error("❌ Update user failed:", err.message);
+>>>>>>> origin/main
         res.status(500).json({ error: "Failed to update user" });
     }
 };
@@ -132,7 +160,32 @@ exports.deleteUser = async (req, res) => {
         const result = await User.delete(req.params.id);
         res.json({ message: "User deleted", affectedRows: result.affectedRows });
     } catch (err) {
+<<<<<<< HEAD
         console.error("❌ Delete user failed:", err);
         res.status(500).json({ error: "Failed to delete user" });
     }
 };
+=======
+        console.error("❌ Delete user failed:", err.message);
+        res.status(500).json({ error: "Failed to delete user" });
+    }
+};
+
+// LOGIN
+exports.loginUser = async (req, res) => {
+    try {
+        const { username, password } = req.body;
+        const user = await User.findByUsername(username);
+
+        if (!user) return res.status(404).json({ error: "User not found" });
+
+        const isMatch = await bcrypt.compare(password, user.password_hash);
+        if (!isMatch) return res.status(401).json({ error: "Invalid password" });
+
+        res.json({ message: "Login successful", user });
+    } catch (err) {
+        console.error("❌ Login failed:", err.message);
+        res.status(500).json({ error: "Login failed" });
+    }
+};
+>>>>>>> origin/main

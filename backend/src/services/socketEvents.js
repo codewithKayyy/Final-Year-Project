@@ -18,6 +18,7 @@ function attachSocketEvents(io) {
         console.log(`🔌 Client connected: ${socket.id}`);
 
         // ─── 1. Agent Registration ───────────────────────────────
+<<<<<<< HEAD
         socket.on("registerAgent", async (registrationData) => {
             // Handle both old format (string) and new format (object)
             const agentData = typeof registrationData === 'string'
@@ -26,6 +27,11 @@ function attachSocketEvents(io) {
 
             await registerAgent(socket, agentData);
             notifyAgentStatus(agentData.agentId, "online"); // 🔔 Notify dashboards
+=======
+        socket.on("registerAgent", (agentId) => {
+            registerAgent(socket, agentId);
+            notifyAgentStatus(agentId, "online"); // 🔔 Notify dashboards
+>>>>>>> origin/main
         });
 
         // ─── 2. Telemetry Data ──────────────────────────────────
@@ -46,6 +52,7 @@ function attachSocketEvents(io) {
             });
         });
 
+<<<<<<< HEAD
         // ─── 4. Simulation Result (New Format) ─────────────────
         socket.on("simulationResult", async (data) => {
             console.log(`📊 Simulation result from ${data.agentId}:`, data);
@@ -74,13 +81,20 @@ function attachSocketEvents(io) {
         });
 
         // ─── 6. Disconnect ──────────────────────────────────────
+=======
+        // ─── 4. Disconnect ──────────────────────────────────────
+>>>>>>> origin/main
         socket.on("disconnect", () => {
             unregisterAgent(socket.id);
             const agentId = socket.handshake.query?.agentId;
             if (agentId) notifyAgentStatus(agentId, "offline");
         });
 
+<<<<<<< HEAD
         // ─── 7. Error Handler ───────────────────────────────────
+=======
+        // ─── 5. Error Handler ───────────────────────────────────
+>>>>>>> origin/main
         socket.on("error", (err) => {
             console.error(`⚠️ Socket error [${socket.id}]:`, err.message);
         });

@@ -7,7 +7,11 @@ function handleAgentSocket(socket) {
     // Agent registration
     socket.on("registerAgent", (agentId) => {
         if (!agentId) {
+<<<<<<< HEAD
             console.warn("Agent tried to register without agentId");
+=======
+            console.warn("⚠️ Agent tried to register without agentId");
+>>>>>>> origin/main
             return;
         }
         registerAgent(socket, agentId);
@@ -16,7 +20,11 @@ function handleAgentSocket(socket) {
 
     // Attack outcome (persist results to DB)
     socket.on("attackOutcome", async (data) => {
+<<<<<<< HEAD
         console.log(`Attack outcome from agent ${data.agentId}:`, data);
+=======
+        console.log(`📥 Attack outcome from agent ${data.agentId}:`, data);
+>>>>>>> origin/main
 
         try {
             await AttackLog.updateLog({
@@ -31,13 +39,21 @@ function handleAgentSocket(socket) {
 
             notifyAgentStatus(data.agentId, `attack ${data.outcome}`);
         } catch (err) {
+<<<<<<< HEAD
             console.error("Failed to save attack outcome:", err.message);
+=======
+            console.error("❌ Failed to save attack outcome:", err.message);
+>>>>>>> origin/main
         }
     });
 
     // Telemetry
     socket.on("telemetry", (telemetry) => {
+<<<<<<< HEAD
         console.log(`Telemetry from agent:`, telemetry);
+=======
+        console.log(`📡 Telemetry from agent:`, telemetry);
+>>>>>>> origin/main
         // Future: Save telemetry to DB
     });
 

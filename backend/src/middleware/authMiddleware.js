@@ -1,4 +1,7 @@
+<<<<<<< HEAD
 //backend/src/middleware/authMiddleware.js
+=======
+>>>>>>> origin/main
 const jwt = require("jsonwebtoken");
 
 exports.protect = (req, res, next) => {

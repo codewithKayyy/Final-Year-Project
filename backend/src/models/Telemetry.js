@@ -1,9 +1,14 @@
 // backend/src/models/Telemetry.js
+<<<<<<< HEAD
 const db = require("../config/db");
+=======
+const db = require("../services/db");
+>>>>>>> origin/main
 
 const Telemetry = {
     async save(agentId, data) {
         const query = `
+<<<<<<< HEAD
             INSERT INTO telemetry (
                 agent_id, hostname, platform, arch, node_version, uptime,
                 cpu_count, cpu_model, load_average, total_memory_mb,
@@ -48,6 +53,17 @@ const Telemetry = {
         `;
         const [rows] = await db.execute(query, [limit]);
         return rows;
+=======
+            INSERT INTO telemetry (agent_id, cpu, memory, network, timestamp)
+            VALUES (?, ?, ?, ?, NOW())
+        `;
+        await db.query(query, [
+            agentId,
+            data.cpu || null,
+            data.memory || null,
+            data.network || null
+        ]);
+>>>>>>> origin/main
     }
 };
 

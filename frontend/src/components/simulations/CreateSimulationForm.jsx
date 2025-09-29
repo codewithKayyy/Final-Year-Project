@@ -1,12 +1,18 @@
 // frontend/src/components/simulations/CreateSimulationForm.jsx
+<<<<<<< HEAD
 import React, { useState } from "react";
 import { createSimulation } from "../../services/simulationService";
 import { Button } from "../ui/button";
+=======
+import React, { useState } from 'react';
+import { createSimulation } from '../../services/simulationService';
+>>>>>>> origin/main
 
 const CreateSimulationForm = ({ onSuccess }) => {
     const [formData, setFormData] = useState({
         name: "",
         description: "",
+<<<<<<< HEAD
         scheduled_start: "",
         type: "phishing",
         status: "draft",
@@ -14,13 +20,25 @@ const CreateSimulationForm = ({ onSuccess }) => {
         created_by: 1, // TODO: Replace with logged-in user ID
     });
 
+=======
+        start_time: "",
+        end_time: "",
+        status: "pending", // Default status
+        created_by_user_id: 1, // Placeholder: Replace with actual logged-in user ID
+    });
+>>>>>>> origin/main
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
 
     const handleChange = (e) => {
         const { name, value } = e.target;
+<<<<<<< HEAD
         setFormData((prev) => ({
             ...prev,
+=======
+        setFormData((prevData) => ({
+            ...prevData,
+>>>>>>> origin/main
             [name]: value,
         }));
     };
@@ -31,6 +49,7 @@ const CreateSimulationForm = ({ onSuccess }) => {
         setError(null);
 
         try {
+<<<<<<< HEAD
             if (!formData.name) {
                 throw new Error("Simulation name is required.");
             }
@@ -44,11 +63,27 @@ const CreateSimulationForm = ({ onSuccess }) => {
                         .replace("T", " ")
                     : null,
                 campaign_id: formData.campaign_id || null,
+=======
+            // Basic validation
+            if (!formData.name || !formData.start_time) {
+                throw new Error("Simulation name and start time are required.");
+            }
+
+            // Format dates for MySQL (YYYY-MM-DD HH:MM:SS)
+            const formattedData = {
+                ...formData,
+                start_time: formData.start_time ? new Date(formData.start_time).toISOString().slice(0, 19).replace('T', ' ') : null,
+                end_time: formData.end_time ? new Date(formData.end_time).toISOString().slice(0, 19).replace('T', ' ') : null,
+>>>>>>> origin/main
             };
 
             const result = await createSimulation(formattedData);
             alert(result.message || "Simulation created successfully!");
+<<<<<<< HEAD
             onSuccess();
+=======
+            onSuccess(); // Close modal and refresh list
+>>>>>>> origin/main
         } catch (err) {
             setError(err.message || "Failed to create simulation.");
         } finally {
@@ -57,6 +92,7 @@ const CreateSimulationForm = ({ onSuccess }) => {
     };
 
     return (
+<<<<<<< HEAD
         <form onSubmit={handleSubmit} className="space-y-4">
             {error && (
                 <div className="bg-red-50 text-red-800 border border-red-200 rounded-md p-4 text-sm">
@@ -126,11 +162,68 @@ const CreateSimulationForm = ({ onSuccess }) => {
             {/* Status */}
             <div className="space-y-1">
                 <label htmlFor="status" className="block text-sm font-medium text-gray-700">Status</label>
+=======
+        <form onSubmit={handleSubmit} className="p-4">
+            {error && <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4" role="alert">{error}</div>}
+
+            <div className="mb-4">
+                <label htmlFor="name" className="block text-gray-700 text-sm font-bold mb-2">Simulation Name:</label>
+                <input
+                    type="text"
+                    id="name"
+                    name="name"
+                    value={formData.name}
+                    onChange={handleChange}
+                    className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                    required
+                />
+            </div>
+
+            <div className="mb-4">
+                <label htmlFor="description" className="block text-gray-700 text-sm font-bold mb-2">Description:</label>
+                <textarea
+                    id="description"
+                    name="description"
+                    value={formData.description}
+                    onChange={handleChange}
+                    className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline h-24"
+                ></textarea>
+            </div>
+
+            <div className="mb-4">
+                <label htmlFor="start_time" className="block text-gray-700 text-sm font-bold mb-2">Start Time:</label>
+                <input
+                    type="datetime-local"
+                    id="start_time"
+                    name="start_time"
+                    value={formData.start_time}
+                    onChange={handleChange}
+                    className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                    required
+                />
+            </div>
+
+            <div className="mb-4">
+                <label htmlFor="end_time" className="block text-gray-700 text-sm font-bold mb-2">End Time (Optional):</label>
+                <input
+                    type="datetime-local"
+                    id="end_time"
+                    name="end_time"
+                    value={formData.end_time}
+                    onChange={handleChange}
+                    className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                />
+            </div>
+
+            <div className="mb-4">
+                <label htmlFor="status" className="block text-gray-700 text-sm font-bold mb-2">Status:</label>
+>>>>>>> origin/main
                 <select
                     id="status"
                     name="status"
                     value={formData.status}
                     onChange={handleChange}
+<<<<<<< HEAD
                     className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 >
                     <option value="draft">Draft</option>
@@ -164,9 +257,35 @@ const CreateSimulationForm = ({ onSuccess }) => {
                 <Button type="submit" disabled={loading}>
                     {loading ? "Creating..." : "Create Simulation"}
                 </Button>
+=======
+                    className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                >
+                    <option value="pending">Pending</option>
+                    <option value="running">Running</option>
+                    <option value="completed">Completed</option>
+                    <option value="failed">Failed</option>
+                </select>
+            </div>
+
+            {/* created_by_user_id will eventually come from authentication context */}
+            <input type="hidden" name="created_by_user_id" value={formData.created_by_user_id} />
+
+            <div className="flex items-center justify-between">
+                <button
+                    type="submit"
+                    className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+                    disabled={loading}
+                >
+                    {loading ? "Creating..." : "Create Simulation"}
+                </button>
+>>>>>>> origin/main
             </div>
         </form>
     );
 };
 
+<<<<<<< HEAD
 export default CreateSimulationForm;
+=======
+export default CreateSimulationForm;
+>>>>>>> origin/main

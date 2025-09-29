@@ -1,12 +1,19 @@
 {
+<<<<<<< HEAD
   "name": "security-simulation-agent",
   "version": "1.0.0",
   "description": "Cybersecurity simulation agent for distributed deployment",
+=======
+  "name": "agent-app",
+  "version": "1.0.0",
+  "description": "",
+>>>>>>> origin/main
   "license": "ISC",
   "author": "",
   "type": "commonjs",
   "main": "index.js",
   "scripts": {
+<<<<<<< HEAD
     "start": "node index.js",
     "install-service": "node install-service.js",
     "uninstall-service": "node uninstall-service.js",
@@ -25,5 +32,8 @@
       "node18-linux-x64"
     ],
     "outputPath": "dist"
+=======
+    "test": "echo \"Error: no test specified\" && exit 1"
+>>>>>>> origin/main
   }
 }

@@ -9,7 +9,11 @@ let io;
  */
 function initSocket(server) {
     if (io) {
+<<<<<<< HEAD
         console.warn("Socket.IO already initialized. Returning existing instance.");
+=======
+        console.warn("⚠️ Socket.IO already initialized. Returning existing instance.");
+>>>>>>> origin/main
         return io;
     }
 
@@ -20,13 +24,21 @@ function initSocket(server) {
         }
     });
 
+<<<<<<< HEAD
     console.log("Socket.IO initialized");
+=======
+    console.log("✅ Socket.IO initialized");
+>>>>>>> origin/main
     return io;
 }
 
 function getIo() {
     if (!io) {
+<<<<<<< HEAD
         throw new Error("Socket.IO not initialized. Call initSocket(server) first.");
+=======
+        throw new Error("❌ Socket.IO not initialized. Call initSocket(server) first.");
+>>>>>>> origin/main
     }
     return io;
 }

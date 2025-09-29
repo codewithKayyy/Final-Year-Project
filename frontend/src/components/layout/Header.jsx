@@ -15,7 +15,11 @@ const Header = () => {
     return (
         <header className="bg-gray-800 text-white p-4 flex justify-between items-center shadow-md">
             <div className="flex items-center">
+<<<<<<< HEAD
                 <Link to="/dashboard" className="text-xl font-bold">Admin Console</Link>
+=======
+                <Link to="/dashboard" className="text-xl font-bold">CyberSim Dashboard</Link>
+>>>>>>> origin/main
             </div>
             <nav className="flex items-center space-x-4">
                 <button className="p-2 rounded-full hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500">

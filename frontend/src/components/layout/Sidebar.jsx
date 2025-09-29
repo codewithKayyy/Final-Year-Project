@@ -8,8 +8,11 @@ import {
     FaClipboardList,
     FaCog,
     FaShieldAlt,
+<<<<<<< HEAD
     FaBullhorn,
     FaEnvelope,
+=======
+>>>>>>> origin/main
 } from 'react-icons/fa';
 
 const Sidebar = () => {
@@ -18,10 +21,15 @@ const Sidebar = () => {
     const navItems = [
         { name: 'Dashboard', icon: FaTachometerAlt, path: '/dashboard' },
         { name: 'Staff Management', icon: FaUsers, path: '/staff' },
+<<<<<<< HEAD
         { name: 'Agent Management', icon: FaRobot, path: '/agents' },
         { name: 'Campaign Management', icon: FaBullhorn, path: '/campaigns' },
         { name: 'Simulation Management', icon: FaFlask, path: '/simulations' },
         { name: 'Email Templates', icon: FaEnvelope, path: '/email-templates' },
+=======
+        { name: 'Simulation Config', icon: FaFlask, path: '/simulations' },
+        { name: 'Agent Management', icon: FaRobot, path: '/agents' },
+>>>>>>> origin/main
         { name: 'Attack Logs', icon: FaClipboardList, path: '/attack-logs' },
         { name: 'Security Controls', icon: FaShieldAlt, path: '/security-controls' },
         { name: 'Settings', icon: FaCog, path: '/settings' },
