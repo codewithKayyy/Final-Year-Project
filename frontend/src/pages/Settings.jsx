@@ -74,11 +74,11 @@ const Settings = () => {
     };
 
     return (
-        <div className="space-y-6">
+
+        <div className="p-6 space-y-6 bg-gray-50 min-h-screen">
             {/* Page Header */}
             <div>
                 <div className="flex items-center mb-2">
-                    <FaCog className="text-blue-600 mr-3" size={28} />
                     <h2 className="text-2xl font-bold">Settings</h2>
                 </div>
                 <p className="text-gray-600">

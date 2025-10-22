@@ -106,7 +106,6 @@ const PhishingTemplates = () => {
             {/* Header */}
             <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                    <FaEnvelope className="text-primary" size={32} />
                     <div>
                         <h2 className="text-2xl font-bold">Email Templates</h2>
                         <p className="text-gray-500">Manage phishing email templates for campaigns</p>

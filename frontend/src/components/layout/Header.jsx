@@ -18,7 +18,7 @@ const Header = () => {
             {/* Logo / Dashboard link */}
             <div className="flex items-center">
                 <Link to="/dashboard" className="text-xl font-bold">
-                    CyberSim Dashboard
+                    Admin Console
                 </Link>
             </div>
 

@@ -168,7 +168,6 @@ const AgentManagement = () => {
         <div className="p-6 space-y-6 bg-gray-50 min-h-screen">
             {/* Header */}
             <div className="flex items-center gap-3">
-                <FaRobot className="text-primary" size={32} />
                 <div>
                     <h2 className="text-2xl font-bold">Agent Management</h2>
                     <p className="text-gray-500">
